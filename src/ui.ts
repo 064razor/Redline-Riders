@@ -5,6 +5,10 @@ export const UI = {
     shiftLock: false,
 
     showCountdown(value: any) {
+        const countdownEl = document.getElementById("countdown");
+        if (countdownEl) {
+            countdownEl.innerText = value;
+        }
         console.log("Countdown:", value);
     },
 
