@@ -9,14 +9,18 @@ export const Game = {
     raceStarted: false,
     countdownActive: false,
     countdownValue: 3,
+    shiftFeedback: "",
+    shiftFeedbackTimer: 0,
 
     start() {
         this.playerCar = Garage.getStarter();
-        this.aiCar = Garage.getStarter(); // temporary (we’ll fix AI later)
+        this.aiCar = Garage.getStarter(); // temporary (we'll fix AI later)
 
         this.raceStarted = false;
         this.countdownActive = true;
         this.countdownValue = 3;
+        this.shiftFeedback = "";
+        this.shiftFeedbackTimer = 0;
 
         UI.showCountdown(this.countdownValue);
 
@@ -47,6 +51,11 @@ export const Game = {
 
                 Render.draw(this.playerCar, this.aiCar);
                 UI.update(this.playerCar, this);
+                
+                // Decay shift feedback timer
+                if (this.shiftFeedbackTimer > 0) {
+                    this.shiftFeedbackTimer -= 0.016;
+                }
             }
 
             requestAnimationFrame(update);
