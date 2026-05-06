@@ -1,4 +1,3 @@
-export const UI = {
 import { Game } from "./game.js";
 import { Input } from "./input.js";
 import { UI } from "./ui.js";
