@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redline: Phase 3</title>
+
+    <style>
+        body {
+            background: black;
+            color: white;
+            font-family: Orbitron, sans-serif;
+            text-align: center;
+        }
+
+        button {
+            background: #111;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        canvas {
+            background: #111;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Redline</h1>
+
+<div>
+    <label>Track Length:</label>
+    <select id="trackSelect">
+        <option value="200">Short</option>
+        <option value="400" selected>Medium</option>
+        <option value="800">Long</option>
+        <option value="1200">Extreme</option>
+    </select>
+</div>
+
+<div>
+    <label>Difficulty:</label>
+    <select id="difficultySelect">
+        <option value="easy">Easy</option>
+        <option value="normal" selected>Normal</option>
+        <option value="hard">Hard</option>
+    </select>
+</div>
+
+<button onclick="Game.start()">Start Race</button>
+
+<div id="controls" style="
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.6;
+">
+    <div><b>Controls:</b></div>
+    <div>↑ Hold = Rev engine</div>
+    <div>Space = Shift gear</div>
+</div>
+
+<div id="rpm"></div>
+<div id="speed"></div>
+<div id="gear"></div>
+<div id="shiftMsg" style="height: 25px;"></div>
+
+<canvas id="gameCanvas" width="600" height="150"></canvas>
+<canvas id="tachCanvas" width="300" height="200"></canvas>
+
+<div id="countdown" style="
+    position:absolute;
+    top:140px;
+    left:66%;
+    transform:translateX(-50%);
+    font-size:48px;
+	 font-weight: bold;
+    color:white;
+    pointer-events:none;
+"></div>
+
+<!-- CORE -->
+<script type="module" src="dist/main.js"></script>
+
+</body>
+</html>
