@@ -15,9 +15,9 @@ export const Input = {
             if (e.code === "Space") {
 
                 // ✅ only shift during race
-                if (game.state !== "racing") return;
+                if (!game.raceStarted) return;
 
-                this.shift(game.player, game);
+                this.shift(game.playerCar, game);
             }
         });
 
