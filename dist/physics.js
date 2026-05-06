@@ -1,5 +1,5 @@
-import { Game } from "./game";
-import { Input } from "./input";
+import { Game } from "./game.js";
+import { Input } from "./input.js";
 export const Physics = {
     update(car, dt) {
         if (!dt)

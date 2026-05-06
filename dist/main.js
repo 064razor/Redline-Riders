@@ -1,6 +1,6 @@
-import { Game } from "./game";
-import { Input } from "./input";
-import { UI } from "./ui";
+import { Game } from "./game.js";
+import { Input } from "./input.js";
+import { UI } from "./ui.js";
 // TEMP bridge so your HTML button still works
 window.Game = Game;
 // Initialize systems

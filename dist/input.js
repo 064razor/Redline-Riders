@@ -10,9 +10,9 @@ export const Input = {
             // ===== SHIFT =====
             if (e.code === "Space") {
                 // ✅ only shift during race
-                if (game.state !== "racing")
+                if (!game.raceStarted)
                     return;
-                this.shift(game.player, game);
+                this.shift(game.playerCar, game);
             }
         });
         document.addEventListener("keyup", (e) => {

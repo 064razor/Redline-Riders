@@ -1,5 +1,5 @@
 console.log("render loaded");
-import { UI } from "./ui";
+import { UI } from "./ui.js";
 export const Render = {
     draw(player, ai) {
         const canvas = document.getElementById("gameCanvas");

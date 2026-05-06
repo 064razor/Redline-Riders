@@ -1,7 +1,7 @@
-import { Garage } from "./garage";
-import { UI } from "./ui";
-import { Render } from "./render";
-import { Physics } from "./physics";
+import { Garage } from "./garage.js";
+import { UI } from "./ui.js";
+import { Render } from "./render.js";
+import { Physics } from "./physics.js";
 export const Game = {
     playerCar: null,
     aiCar: null,
