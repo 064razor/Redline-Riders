@@ -7,6 +7,7 @@ export const Game = {
     aiCar: null,
     raceStarted: false,
     countdownActive: false,
+    loopRunning: false,
     countdownValue: 3,
     start() {
         this.playerCar = Garage.getStarter();

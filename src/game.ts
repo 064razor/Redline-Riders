@@ -8,6 +8,7 @@ export const Game = {
     aiCar: null as any,
     raceStarted: false,
     countdownActive: false,
+	loopRunning: false,
     countdownValue: 3,
 
     start() {
