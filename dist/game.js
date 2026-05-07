@@ -12,6 +12,7 @@ export const Game = {
     launchState: "",
     launchTriggered: false,
     launchTimer: 0,
+    money: 0,
     start() {
         if (this.countdownActive || this.raceStarted)
             return;
@@ -71,6 +72,13 @@ export const Game = {
             Physics.update(this.playerCar, 0.016);
             if (this.raceStarted) {
                 Physics.update(this.aiCar, 0.016);
+                // ===== SIMPLE WIN REWARD =====
+                if (this.raceStarted &&
+                    this.playerCar.pos >= 1000) {
+                    this.money += 100;
+                    this.raceStarted = false;
+                    alert("You won! +$100");
+                }
             }
             // launch message timer
             if (this.launchTimer > 0) {

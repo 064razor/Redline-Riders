@@ -23,6 +23,9 @@ export const UI = {
         document.getElementById("gear")!.innerText =
             "Gear: " + player.gear;
 			
+		document.getElementById("money")!.innerText =
+            "$" + game.money;
+			
 			// ✅ ADD THIS
             this.drawTach(player, game);
     },

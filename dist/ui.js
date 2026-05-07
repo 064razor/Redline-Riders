@@ -17,6 +17,8 @@ export const UI = {
             "Speed: " + Math.round(player.spd * 20) + " MPH";
         document.getElementById("gear").innerText =
             "Gear: " + player.gear;
+        document.getElementById("money").innerText =
+            "$" + game.money;
         // ✅ ADD THIS
         this.drawTach(player, game);
     },
