@@ -88,7 +88,7 @@ export const UI = {
         const wheelspinFlicker = car.wheelspin && Math.random() > 0.3;
         ctx.fillStyle = wheelspinFlicker ? "#ff9933" : "#333";
         ctx.beginPath();
-        ctx.arc(centerX - 80, centerY + 40, 8, 0, Math.PI * 2);
+        ctx.arc(centerX - 90, centerY + 75, 8, 0, Math.PI * 2);
         ctx.fill();
         // ===== DRAW SHIFT INDICATOR LIGHT =====
         let shiftLightColor = "#333";
@@ -122,7 +122,7 @@ export const UI = {
         }
         ctx.fillStyle = shiftLightColor;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + 35, 8, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY + 80, 8, 0, Math.PI * 2);
         ctx.fill();
     },
     drawShiftIndicator(ctx, x, y) { },
