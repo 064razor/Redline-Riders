@@ -48,7 +48,21 @@ export const UI = {
         const radius = 70;
         const startAngle = Math.PI; // 180 degrees (left)
         const endAngle = 0; // 0 degrees (right)
-        
+		
+		
+        // ===== DRAW GAUGE BACKGROUND =====
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.stroke();
+		
+        // ===== DRAW CENTER CIRCLE =====
+        ctx.fillStyle = "#222";
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
+        ctx.fill();
+
 		// ===== DRAW LAUNCH MESSAGE =====
         if (game.launchTriggered) {
 
@@ -62,12 +76,6 @@ export const UI = {
                  centerY - 25
              );
         }
-        // ===== DRAW GAUGE BACKGROUND =====
-        ctx.strokeStyle = "#333";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.stroke();
 
         // ===== DRAW GEAR MARKERS & NUMBERS =====
         ctx.fillStyle = "#fff";
@@ -112,12 +120,6 @@ export const UI = {
             centerY + Math.sin(needleAngle) * needleLength
         );
         ctx.stroke();
-
-        // ===== DRAW CENTER CIRCLE =====
-        ctx.fillStyle = "#222";
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-        ctx.fill();
 		
         // ===== DRAW WHEELSPIN INDICATOR (ORANGE LIGHT) =====
         const wheelspinFlicker = car.wheelspin && Math.random() > 0.3;
