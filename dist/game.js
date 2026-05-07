@@ -44,12 +44,14 @@ export const Game = {
             return;
         this.loopRunning = true;
         const update = () => {
+            // physics only during race
             if (this.raceStarted) {
                 Physics.update(this.playerCar, 0.016);
                 Physics.update(this.aiCar, 0.016);
-                Render.draw(this.playerCar, this.aiCar);
-                UI.update(this.playerCar, this);
             }
+            // always render/update UI
+            Render.draw(this.playerCar, this.aiCar);
+            UI.update(this.playerCar, this);
             requestAnimationFrame(update);
         };
         update();

@@ -51,22 +51,25 @@ export const Game = {
     },
 
     loop() {
-		
-		if (this.loopRunning) return;
-        this.loopRunning = true;
 
-        const update = () => {
-            if (this.raceStarted) {
-                Physics.update(this.playerCar, 0.016);
-                Physics.update(this.aiCar, 0.016);
+    if (this.loopRunning) return;
+    this.loopRunning = true;
 
-                Render.draw(this.playerCar, this.aiCar);
-                UI.update(this.playerCar, this);
-            }
+    const update = () => {
 
-            requestAnimationFrame(update);
-        };
+        // physics only during race
+        if (this.raceStarted) {
+            Physics.update(this.playerCar, 0.016);
+            Physics.update(this.aiCar, 0.016);
+        }
 
-        update();
-    }
+        // always render/update UI
+        Render.draw(this.playerCar, this.aiCar);
+        UI.update(this.playerCar, this);
+
+        requestAnimationFrame(update);
+    };
+
+    update();
+}
 };
