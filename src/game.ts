@@ -23,6 +23,9 @@ export const Game = {
         this.countdownValue = 3;
 
         UI.showCountdown(this.countdownValue);
+	    
+		// ✅ START LOOP IMMEDIATELY
+        this.loop();
 
         this.runCountdown();
     },
@@ -45,7 +48,6 @@ export const Game = {
                 }, 800);
 
                 this.raceStarted = true;
-                this.loop();
             }
         }, 1000);
     },
