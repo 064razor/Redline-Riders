@@ -12,6 +12,7 @@ export const Game = {
     countdownValue: 3,
 	launchState: "",
     launchTriggered: false,
+	launchTimer: 0,
 
     start() {
 		
@@ -25,6 +26,7 @@ export const Game = {
         this.countdownValue = 3;
 		this.launchState = "";
         this.launchTriggered = false;
+		this.launchTimer = 0;
 
         UI.showCountdown(this.countdownValue);
 	    
@@ -68,6 +70,7 @@ export const Game = {
                 }
 
                 this.launchTriggered = true;
+				this.launchTimer = 1.5;
 				
                 this.raceStarted = true;
             }
@@ -87,7 +90,16 @@ export const Game = {
         if (this.raceStarted) {
             Physics.update(this.aiCar, 0.016);
 }
+        // launch message timer
+        if (this.launchTimer > 0) {
 
+            this.launchTimer -= 0.016;
+
+            if (this.launchTimer <= 0) {
+                this.launchTriggered = false;
+            }
+        }
+		
         // always render/update UI
         Render.draw(this.playerCar, this.aiCar);
         UI.update(this.playerCar, this);

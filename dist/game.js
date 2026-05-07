@@ -11,6 +11,7 @@ export const Game = {
     countdownValue: 3,
     launchState: "",
     launchTriggered: false,
+    launchTimer: 0,
     start() {
         if (this.countdownActive || this.raceStarted)
             return;
@@ -21,6 +22,7 @@ export const Game = {
         this.countdownValue = 3;
         this.launchState = "";
         this.launchTriggered = false;
+        this.launchTimer = 0;
         UI.showCountdown(this.countdownValue);
         // ✅ START LOOP IMMEDIATELY
         this.loop();
@@ -55,6 +57,7 @@ export const Game = {
                     this.launchState = "Rough Launch";
                 }
                 this.launchTriggered = true;
+                this.launchTimer = 1.5;
                 this.raceStarted = true;
             }
         }, 1000);
@@ -68,6 +71,13 @@ export const Game = {
             Physics.update(this.playerCar, 0.016);
             if (this.raceStarted) {
                 Physics.update(this.aiCar, 0.016);
+            }
+            // launch message timer
+            if (this.launchTimer > 0) {
+                this.launchTimer -= 0.016;
+                if (this.launchTimer <= 0) {
+                    this.launchTriggered = false;
+                }
             }
             // always render/update UI
             Render.draw(this.playerCar, this.aiCar);
