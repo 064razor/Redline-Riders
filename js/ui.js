@@ -163,7 +163,7 @@ const UI = {
         const time = Date.now();
 
         const x = centerX;
-        const y = centerY - 60 + Math.sin(time * 0.01) * 2;
+        const y = centerY - 8 + Math.sin(time * 0.01) * 2;
 
         let color = "white";
         let glow = 0;
