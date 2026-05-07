@@ -20,8 +20,6 @@ export const Render = {
             ctx.fillText(">>", 260, 50);
         if (aiOffset < -200)
             ctx.fillText("<<", 20, 50);
-        // ===== TACH =====
-        UI.drawTach(player);
         // ===== UI OVERLAYS (VERY IMPORTANT ORDER) =====
         UI.drawExtras(player);
     }

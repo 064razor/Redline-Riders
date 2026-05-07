@@ -18,13 +18,13 @@ export const UI = {
         document.getElementById("gear").innerText =
             "Gear: " + player.gear;
         // ✅ ADD THIS
-        this.drawTach(player);
+        this.drawTach(player, game);
     },
     triggerShiftFeedback(state) {
         this.shiftState = state;
         this.shiftTimer = 0.8;
     },
-    drawTach(car) {
+    drawTach(car, game) {
         const canvas = document.getElementById("tachCanvas");
         if (!canvas)
             return;
@@ -38,6 +38,13 @@ export const UI = {
         const radius = 70;
         const startAngle = Math.PI; // 180 degrees (left)
         const endAngle = 0; // 0 degrees (right)
+        // ===== DRAW LAUNCH MESSAGE =====
+        if (game.launchTriggered) {
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(game.launchState, centerX, centerY - 25);
+        }
         // ===== DRAW GAUGE BACKGROUND =====
         ctx.strokeStyle = "#333";
         ctx.lineWidth = 2;
@@ -122,7 +129,7 @@ export const UI = {
         }
         ctx.fillStyle = shiftLightColor;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + 80, 8, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY + 10, 8, 0, Math.PI * 2);
         ctx.fill();
     },
     drawShiftIndicator(ctx, x, y) { },

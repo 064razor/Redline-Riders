@@ -24,7 +24,7 @@ export const UI = {
             "Gear: " + player.gear;
 			
 			// ✅ ADD THIS
-            this.drawTach(player);
+            this.drawTach(player, game);
     },
 
     triggerShiftFeedback(state: any) {
@@ -32,7 +32,7 @@ export const UI = {
         this.shiftTimer = 0.8;
     },
 
-    drawTach(car: any) {
+    drawTach(car: any, game: any) {
         const canvas = document.getElementById("tachCanvas") as HTMLCanvasElement;
         if (!canvas) return;
         
@@ -48,7 +48,20 @@ export const UI = {
         const radius = 70;
         const startAngle = Math.PI; // 180 degrees (left)
         const endAngle = 0; // 0 degrees (right)
+        
+		// ===== DRAW LAUNCH MESSAGE =====
+        if (game.launchTriggered) {
 
+             ctx.fillStyle = "#ffffff";
+             ctx.font = "bold 16px Arial";
+             ctx.textAlign = "center";
+
+             ctx.fillText(
+                 game.launchState,
+                 centerX,
+                 centerY - 25
+             );
+        }
         // ===== DRAW GAUGE BACKGROUND =====
         ctx.strokeStyle = "#333";
         ctx.lineWidth = 2;
@@ -105,7 +118,7 @@ export const UI = {
         ctx.beginPath();
         ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
         ctx.fill();
-
+		
         // ===== DRAW WHEELSPIN INDICATOR (ORANGE LIGHT) =====
         const wheelspinFlicker = car.wheelspin && Math.random() > 0.3;
         ctx.fillStyle = wheelspinFlicker ? "#ff9933" : "#333";
@@ -141,7 +154,7 @@ export const UI = {
 
         ctx.fillStyle = shiftLightColor;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + 80, 8, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY + 10, 8, 0, Math.PI * 2);
         ctx.fill();
     },
 

@@ -9,6 +9,8 @@ export const Game = {
     countdownActive: false,
     loopRunning: false,
     countdownValue: 3,
+    launchState: "",
+    launchTriggered: false,
     start() {
         if (this.countdownActive || this.raceStarted)
             return;
@@ -17,6 +19,8 @@ export const Game = {
         this.raceStarted = false;
         this.countdownActive = true;
         this.countdownValue = 3;
+        this.launchState = "";
+        this.launchTriggered = false;
         UI.showCountdown(this.countdownValue);
         // ✅ START LOOP IMMEDIATELY
         this.loop();
@@ -36,6 +40,21 @@ export const Game = {
                 setTimeout(() => {
                     UI.showCountdown("");
                 }, 800);
+                const rpm = this.playerCar.rpm;
+                const max = this.playerCar.maxRPM;
+                if (rpm < max * 0.45) {
+                    this.launchState = "Early Launch";
+                }
+                else if (rpm < max * 0.75) {
+                    this.launchState = "Good Launch";
+                }
+                else if (rpm < max * 0.9) {
+                    this.launchState = "Perfect Launch";
+                }
+                else {
+                    this.launchState = "Rough Launch";
+                }
+                this.launchTriggered = true;
                 this.raceStarted = true;
             }
         }, 1000);
