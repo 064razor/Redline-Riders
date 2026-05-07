@@ -14,6 +14,7 @@ export const Game = {
     launchTriggered: false,
 	launchTimer: 0,
 	money: 0,
+	raceFinished: false,
 
     start() {
 		
@@ -21,6 +22,8 @@ export const Game = {
 		
         this.playerCar = Garage.getStarter();
         this.aiCar = Garage.getStarter(); // temporary (we’ll fix AI later)
+		this.playerCar.pos = 0;
+        this.aiCar.pos = 0;
 
         this.raceStarted = false;
         this.countdownActive = true;
@@ -28,6 +31,7 @@ export const Game = {
 		this.launchState = "";
         this.launchTriggered = false;
 		this.launchTimer = 0;
+		this.raceFinished = false;
 		
 
         UI.showCountdown(this.countdownValue);
@@ -92,16 +96,19 @@ export const Game = {
         if (this.raceStarted) {
             Physics.update(this.aiCar, 0.016);
 			
-			// ===== SIMPLE WIN REWARD =====
-            if (
+		// ===== SIMPLE WIN REWARD =====
+        if (
             this.raceStarted &&
+            !this.raceFinished &&
             this.playerCar.pos >= 1000
-        )   {
-            this.money += 100;
+        ) {
+            this.raceFinished = true;
             this.raceStarted = false;
 
+            this.money += 100;
+
             alert("You won! +$100");
-}
+        }
 }
         // launch message timer
         if (this.launchTimer > 0) {

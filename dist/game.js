@@ -13,17 +13,21 @@ export const Game = {
     launchTriggered: false,
     launchTimer: 0,
     money: 0,
+    raceFinished: false,
     start() {
         if (this.countdownActive || this.raceStarted)
             return;
         this.playerCar = Garage.getStarter();
         this.aiCar = Garage.getStarter(); // temporary (we’ll fix AI later)
+        this.playerCar.pos = 0;
+        this.aiCar.pos = 0;
         this.raceStarted = false;
         this.countdownActive = true;
         this.countdownValue = 3;
         this.launchState = "";
         this.launchTriggered = false;
         this.launchTimer = 0;
+        this.raceFinished = false;
         UI.showCountdown(this.countdownValue);
         // ✅ START LOOP IMMEDIATELY
         this.loop();
@@ -74,9 +78,11 @@ export const Game = {
                 Physics.update(this.aiCar, 0.016);
                 // ===== SIMPLE WIN REWARD =====
                 if (this.raceStarted &&
+                    !this.raceFinished &&
                     this.playerCar.pos >= 1000) {
-                    this.money += 100;
+                    this.raceFinished = true;
                     this.raceStarted = false;
+                    this.money += 100;
                     alert("You won! +$100");
                 }
             }

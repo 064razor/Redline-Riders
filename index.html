@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redline: Phase 3</title>
+    <title>Redline Riders: Alpha</title>
 
     <style>
         body {
@@ -28,7 +28,7 @@
 
 <body>
 
-<h1>Redline</h1>
+<h1>Redline Riders: Alpha</h1>
 
 <div>
     <label>Track Length:</label>
@@ -49,7 +49,7 @@
     </select>
 </div>
 
-<button onclick="Game.start()">Start Race</button>
+<button id="startBtn">Start Race</button>
 
 <div id="controls" style="
     margin-top: 10px;
@@ -65,6 +65,13 @@
 <div id="rpm"></div>
 <div id="speed"></div>
 <div id="gear"></div>
+<div id="money">$0</div>
+
+<div style="margin-top: 10px;">
+    <button id="buyTires">Buy Tires ($200)</button>
+    <button id="buyEngine">Buy Engine ($300)</button>
+</div>
+
 <div id="shiftMsg" style="height: 25px;"></div>
 
 <canvas id="gameCanvas" width="600" height="150"></canvas>
