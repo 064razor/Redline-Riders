@@ -46,8 +46,8 @@ export const Game = {
         this.loopRunning = true;
         const update = () => {
             // physics only during race
+            Physics.update(this.playerCar, 0.016);
             if (this.raceStarted) {
-                Physics.update(this.playerCar, 0.016);
                 Physics.update(this.aiCar, 0.016);
             }
             // always render/update UI
