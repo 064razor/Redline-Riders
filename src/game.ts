@@ -33,6 +33,8 @@ export const Game = {
                 clearInterval(interval);
                 UI.showCountdown("GO!");
 				
+				this.countdownActive = false;
+				
 				// ✅ ADD THIS
                 setTimeout(() => {
                     UI.showCountdown("");

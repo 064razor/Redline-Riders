@@ -26,6 +26,7 @@ export const Game = {
             else {
                 clearInterval(interval);
                 UI.showCountdown("GO!");
+                this.countdownActive = false;
                 // ✅ ADD THIS
                 setTimeout(() => {
                     UI.showCountdown("");
