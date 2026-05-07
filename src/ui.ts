@@ -22,6 +22,9 @@ export const UI = {
 
         document.getElementById("gear")!.innerText =
             "Gear: " + player.gear;
+			
+			// ✅ ADD THIS
+            this.drawTach(player);
     },
 
     triggerShiftFeedback(state: any) {
