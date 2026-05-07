@@ -26,6 +26,10 @@ export const Game = {
             else {
                 clearInterval(interval);
                 UI.showCountdown("GO!");
+                // ✅ ADD THIS
+                setTimeout(() => {
+                    UI.showCountdown("");
+                }, 800);
                 this.raceStarted = true;
                 this.loop();
             }
