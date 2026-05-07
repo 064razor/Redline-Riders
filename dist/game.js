@@ -10,6 +10,8 @@ export const Game = {
     loopRunning: false,
     countdownValue: 3,
     start() {
+        if (this.countdownActive || this.raceStarted)
+            return;
         this.playerCar = Garage.getStarter();
         this.aiCar = Garage.getStarter(); // temporary (we’ll fix AI later)
         this.raceStarted = false;
@@ -38,6 +40,9 @@ export const Game = {
         }, 1000);
     },
     loop() {
+        if (this.loopRunning)
+            return;
+        this.loopRunning = true;
         const update = () => {
             if (this.raceStarted) {
                 Physics.update(this.playerCar, 0.016);
