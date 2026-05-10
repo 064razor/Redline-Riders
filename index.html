@@ -33,10 +33,10 @@
 <div>
     <label>Track Length:</label>
     <select id="trackSelect">
-        <option value="200">Short</option>
-        <option value="400" selected>Medium</option>
-        <option value="800">Long</option>
-        <option value="1200">Extreme</option>
+        <option value="40">Short</option>
+        <option value="80" selected>Medium</option>
+        <option value="140">Long</option>
+        <option value="220">Extreme</option>
     </select>
 </div>
 
@@ -50,6 +50,31 @@
 </div>
 
 <button id="startBtn">Start Race</button>
+<button id="optionsBtn">Options</button>
+
+<div id="optionsPanel" style="display:none; margin-top:10px;">
+    <label>Speed Unit:</label>
+    <select id="unitSelect">
+        <option value="MPH">MPH</option>
+        <option value="KMH">KM/H</option>
+    </select>
+
+    <br><br>
+
+    <label>Player Lane:</label>
+    <select id="laneSelect">
+        <option value="top">Top</option>
+        <option value="bottom" selected>Bottom</option>
+    </select>
+
+    <br><br>
+
+    <label>Race Direction:</label>
+    <select id="directionSelect">
+        <option value="right" selected>Right</option>
+        <option value="left">Left</option>
+    </select>
+</div>
 
 <div id="controls" style="
     margin-top: 10px;
@@ -62,14 +87,113 @@
     <div>Space = Shift gear</div>
 </div>
 
+<div id="raceMessage" style="
+    font-size: 28px;
+    font-weight: bold;
+    color: #33ff33;
+    height: 40px;
+    margin-top: 10px;
+"></div>
+
+<div id="raceSummary" style="
+    display:none;
+    border:1px solid #444;
+    background:#111;
+    color:white;
+    width:300px;
+    margin:10px auto;
+    padding:12px;
+    line-height:1.6;
+">
+    <div id="summaryTitle" style="font-size:24px; font-weight:bold;"></div>
+    <div id="summaryPlayerTime"></div>
+    <div id="summaryAiTime"></div>
+    <div id="summaryDifference"></div>
+    <div id="summaryReward"></div>
+</div>
+
 <div id="rpm"></div>
 <div id="speed"></div>
 <div id="gear"></div>
 <div id="money">$0</div>
 
 <div style="margin-top: 10px;">
-    <button id="buyTires">Buy Tires ($200)</button>
-    <button id="buyEngine">Buy Engine ($300)</button>
+    <button id="buyTires"></button>
+    <button id="buyEngine"></button>
+    <button id="buyTransmission"></button>
+    <button id="customizeBtn">Customize</button>
+</div>
+
+<div style="margin-top: 10px;">
+    <button id="dealerBtn">Dealership</button>
+</div>
+
+<div style="margin-top:10px;">
+    <button id="saveBtn">Save Game</button>
+
+    <select id="saveSlotSelect">
+        <option value="1">Slot 1</option>
+        <option value="2">Slot 2</option>
+        <option value="3">Slot 3</option>
+        <option value="4">Slot 4</option>
+        <option value="5">Slot 5</option>
+    </select>
+
+    <button id="loadSlotBtn">Load Slot</button>
+</div>
+
+<div id="dealerPanel" style="
+    display:none;
+    border:1px solid #444;
+    background:#111;
+    width:420px;
+    margin:10px auto;
+    padding:12px;
+    line-height:1.8;
+">
+    <div style="font-weight:bold; font-size:18px; margin-bottom:8px;">
+        Dealership
+    </div>
+
+    <div id="dealerListings"></div>
+</div>
+
+<div id="customizePanel" style="
+    display:none;
+    border:1px solid #444;
+    background:#111;
+    width:360px;
+    margin:10px auto;
+    padding:12px;
+    line-height:2;
+">
+
+<div>
+    <label>Car Paint:</label>
+    <input id="paintColorPicker" type="color" value="#ffffff">
+    <button id="buyPaintColor"></button>
+</div>
+    <div style="font-weight:bold; margin-bottom:8px;">
+        Tachometer Customization
+    </div>
+
+    <div>
+        <label>Needle:</label>
+        <input id="needleColorPicker" type="color" value="#ff3333">
+        <button id="buyNeedleColor"></button>
+    </div>
+
+    <div>
+        <label>Center Circle:</label>
+        <input id="hubColorPicker" type="color" value="#ff3333">
+        <button id="buyHubColor"></button>
+    </div>
+
+    <div>
+        <label>MPH/Gear:</label>
+        <input id="textColorPicker" type="color" value="#ffffff">
+        <button id="buyTextColor"></button>
+    </div>
 </div>
 
 <div id="shiftMsg" style="height: 25px;"></div>
@@ -83,13 +207,12 @@
     left:66%;
     transform:translateX(-50%);
     font-size:48px;
-	 font-weight: bold;
+    font-weight: bold;
     color:white;
     pointer-events:none;
     z-index:10;
 "></div>
 
-<!-- CORE -->
 <script type="module" src="dist/main.js"></script>
 
 </body>
