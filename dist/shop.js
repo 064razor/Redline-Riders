@@ -1,30 +1,51 @@
+import { SaveSystem } from "./save.js";
 export const Shop = {
-    tireLevel: 0,
-    engineLevel: 0,
-    tirePrice: 200,
-    enginePrice: 300,
     buyTires(game) {
-        if (game.money >= this.tirePrice) {
-            game.money -= this.tirePrice;
+        if (game.money >= game.playerCar.tirePrice) {
+            game.money -= game.playerCar.tirePrice;
             game.playerCar.grip += 1;
-            this.tireLevel++;
-            this.tirePrice += 150;
-            alert("Tires upgraded!");
+            game.playerCar.tireLevel++;
+            game.playerCar.tirePrice += 150;
+            SaveSystem.save(game);
+            game.raceMessage = "Tires upgraded!";
+            game.raceMessageTimer = 2;
         }
         else {
-            alert("Not enough money!");
+            game.raceMessage = "Not enough money!";
+            game.raceMessageTimer = 2;
         }
     },
     buyEngine(game) {
-        if (game.money >= this.enginePrice) {
-            game.money -= this.enginePrice;
-            game.playerCar.hp += 25;
-            this.engineLevel++;
-            this.enginePrice += 200;
-            alert("Engine upgraded!");
+        const car = game.playerCar;
+        if (game.money >= car.enginePrice) {
+            game.money -= car.enginePrice;
+            car.hp += 25;
+            car.engineLevel++;
+            car.enginePrice += 200;
+            SaveSystem.save(game);
+            game.raceMessage = "Engine upgraded!";
+            game.raceMessageTimer = 2;
         }
         else {
-            alert("Not enough money!");
+            game.raceMessage = "Not enough money!";
+            game.raceMessageTimer = 2;
+        }
+    },
+    buyTransmission(game) {
+        if (game.money >= game.playerCar.transmissionPrice) {
+            game.money -= game.playerCar.transmissionPrice;
+            game.playerCar.topSpeed += 10;
+            const lastGear = game.playerCar.gearMaxSpeeds.length - 1;
+            game.playerCar.gearMaxSpeeds[lastGear] += 10;
+            game.playerCar.transmissionLevel++;
+            game.playerCar.transmissionPrice += 350;
+            SaveSystem.save(game);
+            game.raceMessage = "Transmission upgraded!";
+            game.raceMessageTimer = 2;
+        }
+        else {
+            game.raceMessage = "Not enough money!";
+            game.raceMessageTimer = 2;
         }
     }
 };

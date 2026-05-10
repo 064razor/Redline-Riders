@@ -1,3 +1,4 @@
+import { UI } from "./ui.js";
 console.log("input loaded");
 export const Input = {
     holdingThrottle: false,
@@ -13,6 +14,8 @@ export const Input = {
                 if (!game.raceStarted)
                     return;
                 this.shift(game.playerCar, game);
+                if (e.repeat)
+                    return;
             }
         });
         document.addEventListener("keyup", (e) => {
@@ -26,30 +29,39 @@ export const Input = {
             return;
         if (car.gear >= car.gearRatios.length)
             return;
-        let r = car.rpm / car.maxRPM;
         let result = "";
         let bonus = 1;
-        if (r < 0.75) {
+        const rpm = car.rpm;
+        if (rpm < car.powerbandMin) {
             result = "EARLY";
-            bonus = 1.0;
+            bonus = 0.96;
         }
-        else if (r < 0.9) {
+        else if (rpm < car.powerbandMax * 0.92) {
             result = "GOOD";
-            bonus = 1.05;
+            bonus = 1.04;
         }
-        else if (r < 0.97) {
+        else if (rpm <= car.powerbandMax) {
             result = "PERFECT";
-            bonus = 1.12;
+            bonus = 1.10;
         }
         else {
             result = "LATE";
-            bonus = 0.9;
+            bonus = 0.92;
         }
         car.gear++;
-        car.shiftTimer = 0.35;
-        car.rpm *= 0.6;
+        car.shiftTimer = 0.5;
+        car.shiftRPMDrop = true;
         car.spd *= bonus;
-        game.shiftFeedback = result;
-        game.shiftFeedbackTimer = 0.6;
+        if (result === "GOOD")
+            game.bonusReward += 2;
+        if (result === "PERFECT")
+            game.bonusReward += 5;
+        if (result === "GOOD") {
+            game.bonusReward += 2;
+        }
+        if (result === "PERFECT") {
+            game.bonusReward += 5;
+        }
+        UI.triggerShiftFeedback(result);
     }
 };

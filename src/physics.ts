@@ -1,3 +1,4 @@
+
 import { Game } from "./game.js";
 import { Input } from "./input.js";
 
@@ -10,8 +11,21 @@ export const Physics = {
         if (!car.gear || car.gear < 1) car.gear = 1;
         if (car.gear > car.gearRatios.length) car.gear = car.gearRatios.length;
 
-        let gearRatio = car.gearRatios[car.gear - 1];
-        if (!gearRatio) gearRatio = car.gearRatios[0];
+        // ===== BASE GEAR RATIO =====
+        let gearRatio =
+            car.gearRatios[car.gear - 1];
+
+        if (!gearRatio) {
+            gearRatio = car.gearRatios[0];
+        }
+
+        // ===== FINAL DRIVE FOR RPM =====
+        const driveRatio =
+            gearRatio * car.finalDrive;
+
+        // ===== SOFTENED DRIVE FORCE =====
+        const accelRatio =
+            1 + ((driveRatio - 1) * 0.30);
 
         // ===== COUNTDOWN REV CONTROL =====
         if (Game.countdownActive && car === Game.playerCar) {
@@ -32,8 +46,23 @@ export const Physics = {
             return;
         }
 
-        // ===== RPM CALC =====
-        car.rpm = car.spd * gearRatio * 1000;
+        // ===== TARGET RPM =====
+        const targetRPM =
+        car.spd * driveRatio * 330;
+
+       // ===== RPM SMOOTHING =====
+       car.rpm += (targetRPM - car.rpm) * 0.12;
+
+       // ===== SHIFT RPM DROP =====
+       if (car.shiftTimer > 0 && car.shiftRPMDrop) {
+
+           car.rpm *= 0.965;
+
+           // Stop dropping once near target
+           if (car.rpm <= targetRPM * 1.05) {
+           car.shiftRPMDrop = false;
+           }
+       }
 
         if (car.rpm < 1000) car.rpm = 1000;
         if (car.rpm > car.maxRPM) car.rpm = car.maxRPM;
@@ -50,15 +79,20 @@ export const Physics = {
         else if (rpmRatio < 0.85) torqueFactor = 1.2;
         else torqueFactor = 0.8;
 
-        let accel = (car.hp / car.weight) * 140;
-        accel *= torqueFactor * gearRatio;
+        let accel = (car.hp / car.weight) * 18;
+        accel *= torqueFactor * accelRatio;
+		
+		// ===== SHIFT INTERRUPTION =====
+        if (car.shiftTimer > 0) {
+        accel *= 0.25;
+        }
 
-        let gripLimit = 5 + (car.spd * 0.05);
+        let gripLimit = car.grip + (car.spd * 0.18);
 
         if (accel > gripLimit) {
             car.wheelspin = true;
-            accel = gripLimit * 0.7;
-            car.spd *= 0.995;
+            accel = gripLimit * 0.82;
+            car.spd *= 0.998;
         } else {
             car.wheelspin = false;
         }
@@ -70,7 +104,23 @@ export const Physics = {
 
         car.spd += totalAccel * dt;
 
-        if (car.spd > car.topSpeed) car.spd = car.topSpeed;
+        // ===== GEAR SPEED LIMIT =====
+        const gearMax =
+        car.gearMaxSpeeds[car.gear - 1] / 20;
+
+        const allowedTopSpeed =
+        Math.min(gearMax, car.topSpeed);
+
+        if (car.spd > allowedTopSpeed) {
+
+            car.spd = allowedTopSpeed;
+
+            // Bounce RPM against limiter
+            if (car.rpm > car.maxRPM * 0.96) {
+                car.rpm *= 0.985;
+            }
+        }
+		
         if (car.spd < 0) car.spd = 0;
 
         car.pos += car.spd * dt;
