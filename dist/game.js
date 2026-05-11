@@ -46,10 +46,12 @@ export const Game = {
         if (save) {
             this.money = (_a = save.money) !== null && _a !== void 0 ? _a : 0;
             this.ownedCars = (_b = save.ownedCars) !== null && _b !== void 0 ? _b : ["maruMk5"];
-            this.garageCars = (_c = save.garageCars) !== null && _c !== void 0 ? _c : {
+            const defaultGarageCars = {
                 maruMk5: Garage.getMaruMk5(),
-                swagGG2: Garage.getSwagGG2()
+                swagGG2: Garage.getSwagGG2(),
+                rouletteBlair: Garage.getRouletteBlair()
             };
+            this.garageCars = Object.assign(Object.assign({}, defaultGarageCars), ((_c = save.garageCars) !== null && _c !== void 0 ? _c : {}));
             this.playerCar =
                 this.garageCars[save.selectedCarId] ||
                     this.garageCars.maruMk5;
@@ -57,7 +59,8 @@ export const Game = {
         else {
             this.garageCars = {
                 maruMk5: Garage.getMaruMk5(),
-                swagGG2: Garage.getSwagGG2()
+                swagGG2: Garage.getSwagGG2(),
+                rouletteBlair: Garage.getRouletteBlair()
             };
             this.playerCar = this.garageCars.maruMk5;
         }
@@ -79,10 +82,20 @@ export const Game = {
         this.raceMessageTimer = 0;
         const aiChoices = [
             Garage.getMaruMk5,
-            Garage.getSwagGG2
+            Garage.getSwagGG2,
+            Garage.getRouletteBlair
         ];
         const aiFactory = aiChoices[Math.floor(Math.random() * aiChoices.length)];
         this.aiCar = aiFactory.call(Garage);
+        const aiRimStyles = [
+            "classic5",
+            "split6",
+            "mesh",
+            "deepDish",
+            "star"
+        ];
+        this.aiCar.rimStyle =
+            aiRimStyles[Math.floor(Math.random() * aiRimStyles.length)];
         const aiColors = [
             "#ffffff", "#ff3333", "#33aaff", "#33ff66",
             "#ffcc33", "#aa66ff", "#ff66cc", "#ff8833",

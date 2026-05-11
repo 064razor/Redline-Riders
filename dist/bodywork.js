@@ -61,6 +61,37 @@ export const Bodywork = {
                 deepDish: "Deep Dish",
                 star: "Star Racer"
             }
+        },
+        rouletteBlair: {
+            id: "rouletteBlair",
+            displayName: "Roulette Blair",
+            inspiration: "Classic Bel-Air-inspired heavyweight muscle cruiser",
+            defaultPaint: "#ffffff",
+            windowColor: "#111a2e",
+            sprite: {
+                imagePath: "./assets/cars/roulette-blair/body-white.png",
+                xOffset: -45,
+                yOffset: -19,
+                width: 115,
+                height: 80,
+                rearWheel: {
+                    x: -15,
+                    y: 32,
+                    radius: 8
+                },
+                frontWheel: {
+                    x: 47,
+                    y: 32,
+                    radius: 8
+                }
+            },
+            rims: {
+                classic5: "Classic 5-Spoke",
+                split6: "Split 6-Spoke",
+                mesh: "Street Mesh",
+                deepDish: "Deep Dish",
+                star: "Star Racer"
+            }
         }
     }
 };

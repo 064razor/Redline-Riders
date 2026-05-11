@@ -14,8 +14,8 @@ export const Garage = {
             tireLevel: 0,
             transmissionLevel: 0,
 
-            enginePrice: 300,
-            tirePrice: 250,
+            enginePrice: 400,
+            tirePrice: 230,
             transmissionPrice: 350,
 
             hp: 120,
@@ -68,7 +68,7 @@ export const Garage = {
             tireLevel: 0,
             transmissionLevel: 0,
 
-            enginePrice: 300,
+            enginePrice: 320,
             tirePrice: 195,
             transmissionPrice: 600,
 
@@ -109,6 +109,67 @@ export const Garage = {
 
             wheelspin: false
         };
-    }
+    },
+	
+	getRouletteBlair() {
+    return {
+        name: "Roulette Blair",
+        bodyId: "rouletteBlair",
+        paintColor: "#ffffff",
+        rimStyle: "classic5",
+		
+		engineLevel: 0,
+        tireLevel: 0,
+        transmissionLevel: 0,
+
+        enginePrice: 275,
+        tirePrice: 700,
+        transmissionPrice: 350,
+
+        hp: 285,
+        weight: 4131,
+        grip: 0.62,
+
+        spd: 0,
+        pos: 0,
+        rpm: 1000,
+        gear: 1,
+
+        maxRPM: 5400,
+
+        powerbandMin: 2200,
+        powerbandMax: 4700,
+
+        gears: 4,
+
+        topSpeed: 168,
+
+        gearRatios: [
+            2.60,
+            1.72,
+            1.18,
+            0.92
+        ],
+
+        gearMaxSpeeds: [
+            52,
+            92,
+            132,
+            168
+        ],
+
+        finalDrive: 3.08,
+
+        shiftSpeed: 0.62,
+        shiftTimer: 0,
+        shiftRPMDrop: false,
+
+        needleColor: "#ff3333",
+        hubColor: "#ff3333",
+        tachTextColor: "#ffffff",
+
+        wheelspin: false
+    };
+},
 
 };

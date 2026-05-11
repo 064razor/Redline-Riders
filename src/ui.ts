@@ -171,7 +171,7 @@ export const UI = {
         ctx.stroke();
 
         // REDLINE ZONE
-        ctx.fillStyle = car.tachTextColor || "#ffffff";
+        ctx.strokeStyle = "#ff3333";
         ctx.lineWidth = 7;
         ctx.beginPath();
         ctx.arc(

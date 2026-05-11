@@ -127,6 +127,14 @@ document.getElementById("optionsBtn")
         panel.style.display = "none";
     }
 };
+const rimBtn = document.getElementById("buyRimStyle");
+rimBtn.innerText =
+    "Buy Rims ($" + Customize.rimPrice + ")";
+rimBtn.onclick = () => {
+    const selector = document.getElementById("rimStyleSelect");
+    Customize.buyRimStyle(Game, selector.value);
+    syncShopUI();
+};
 document.getElementById("unitSelect")
     .onchange = (e) => {
     const target = e.target;

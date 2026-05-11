@@ -166,6 +166,20 @@ syncShopUI();
     }
 };
 
+const rimBtn =
+    document.getElementById("buyRimStyle") as HTMLButtonElement;
+
+rimBtn.innerText =
+    "Buy Rims ($" + Customize.rimPrice + ")";
+
+rimBtn.onclick = () => {
+    const selector =
+        document.getElementById("rimStyleSelect") as HTMLSelectElement;
+
+    Customize.buyRimStyle(Game, selector.value);
+    syncShopUI();
+};
+
 (document.getElementById("unitSelect") as HTMLSelectElement)
 .onchange = (e) => {
 

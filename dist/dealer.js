@@ -12,14 +12,32 @@ export const Dealer = {
         },
         {
             bodyId: "swagGG2",
-            price: 450,
+            price: 1450,
             displayName: Bodywork.cars.swagGG2.displayName,
             description: "Lightweight, zippy hatchback with quick response."
+        },
+        {
+            bodyId: "rouletteBlair",
+            price: 120,
+            displayName: Bodywork.cars.rouletteBlair.displayName,
+            description: "Heavy, but powerful. Built for the drag strip."
         }
     ],
     selectedBodyId: "maruMk5",
     ownsCar(bodyId) {
         return Game.ownedCars.indexOf(bodyId) !== -1;
+    },
+    createCar(bodyId) {
+        if (bodyId === "maruMk5") {
+            return Garage.getMaruMk5();
+        }
+        if (bodyId === "swagGG2") {
+            return Garage.getSwagGG2();
+        }
+        if (bodyId === "rouletteBlair") {
+            return Garage.getRouletteBlair();
+        }
+        return null;
     },
     buyCar(game, bodyId) {
         const listing = this.carsForSale.find(car => car.bodyId === bodyId);
@@ -35,14 +53,15 @@ export const Dealer = {
             game.raceMessageTimer = 2;
             return;
         }
+        const newCar = this.createCar(bodyId);
+        if (!newCar) {
+            game.raceMessage = "Car data missing!";
+            game.raceMessageTimer = 2;
+            return;
+        }
         game.money -= listing.price;
         game.ownedCars.push(bodyId);
-        if (bodyId === "maruMk5") {
-            game.garageCars[bodyId] = Garage.getMaruMk5();
-        }
-        if (bodyId === "swagGG2") {
-            game.garageCars[bodyId] = Garage.getSwagGG2();
-        }
+        game.garageCars[bodyId] = newCar;
         SaveSystem.save(game);
         game.raceMessage = `${listing.displayName} purchased!`;
         game.raceMessageTimer = 2;
@@ -52,6 +71,15 @@ export const Dealer = {
             game.raceMessage = "You do not own this car!";
             game.raceMessageTimer = 2;
             return;
+        }
+        if (!game.garageCars[bodyId]) {
+            const newCar = this.createCar(bodyId);
+            if (!newCar) {
+                game.raceMessage = "Car data missing!";
+                game.raceMessageTimer = 2;
+                return;
+            }
+            game.garageCars[bodyId] = newCar;
         }
         game.playerCar = game.garageCars[bodyId];
         game.raceMessage =

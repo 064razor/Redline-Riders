@@ -1,0 +1,13 @@
+Visual:
+Shift messages missing
+Upgrades do not display how much they improve stats
+Upgrades aren't in-game messages and are still uses browser notifications
+
+Gameplay:
+Shift light and shift timing desynchronized
+
+Balance:
+Lower gears do not limit achievable speed, unrealistic gear ratios, shifting is weaker than never shifting
+Upgrades do not seem to affect performance
+Wheelspin too intense and carries out through whole race
+

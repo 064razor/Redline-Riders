@@ -120,7 +120,7 @@ export const UI = {
         ctx.arc(centerX, centerY, radius + 8, perfectStartAngle, powerbandEndAngle);
         ctx.stroke();
         // REDLINE ZONE
-        ctx.fillStyle = car.tachTextColor || "#ffffff";
+        ctx.strokeStyle = "#ff3333";
         ctx.lineWidth = 7;
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius + 8, powerbandEndAngle, endAngle);

@@ -14,9 +14,15 @@ export const Dealer = {
         },
         {
             bodyId: "swagGG2",
-            price: 450,
+            price: 1450,
             displayName: Bodywork.cars.swagGG2.displayName,
             description: "Lightweight, zippy hatchback with quick response."
+        },
+        {
+            bodyId: "rouletteBlair",
+            price: 120,
+            displayName: Bodywork.cars.rouletteBlair.displayName,
+            description: "Heavy, but powerful. Built for the drag strip."
         }
     ],
 
@@ -26,8 +32,26 @@ export const Dealer = {
         return Game.ownedCars.indexOf(bodyId) !== -1;
     },
 
+    createCar(bodyId: string) {
+        if (bodyId === "maruMk5") {
+            return Garage.getMaruMk5();
+        }
+
+        if (bodyId === "swagGG2") {
+            return Garage.getSwagGG2();
+        }
+
+        if (bodyId === "rouletteBlair") {
+            return Garage.getRouletteBlair();
+        }
+
+        return null;
+    },
+
     buyCar(game: any, bodyId: string) {
-        const listing = this.carsForSale.find(car => car.bodyId === bodyId);
+        const listing =
+            this.carsForSale.find(car => car.bodyId === bodyId);
+
         if (!listing) return;
 
         if (this.ownsCar(bodyId)) {
@@ -42,37 +66,50 @@ export const Dealer = {
             return;
         }
 
-        game.money -= listing.price;
-        game.ownedCars.push(bodyId);
-		
-		if (bodyId === "maruMk5") {
-            game.garageCars[bodyId] = Garage.getMaruMk5();
+        const newCar = this.createCar(bodyId);
+
+        if (!newCar) {
+            game.raceMessage = "Car data missing!";
+            game.raceMessageTimer = 2;
+            return;
         }
 
-        if (bodyId === "swagGG2") {
-            game.garageCars[bodyId] = Garage.getSwagGG2();
-        }
-		
-		SaveSystem.save(game);
+        game.money -= listing.price;
+        game.ownedCars.push(bodyId);
+        game.garageCars[bodyId] = newCar;
+
+        SaveSystem.save(game);
 
         game.raceMessage = `${listing.displayName} purchased!`;
         game.raceMessageTimer = 2;
     },
 
     selectCar(game: any, bodyId: string) {
-    if (!this.ownsCar(bodyId)) {
-        game.raceMessage = "You do not own this car!";
+        if (!this.ownsCar(bodyId)) {
+            game.raceMessage = "You do not own this car!";
+            game.raceMessageTimer = 2;
+            return;
+        }
+
+        if (!game.garageCars[bodyId]) {
+            const newCar = this.createCar(bodyId);
+
+            if (!newCar) {
+                game.raceMessage = "Car data missing!";
+                game.raceMessageTimer = 2;
+                return;
+            }
+
+            game.garageCars[bodyId] = newCar;
+        }
+
+        game.playerCar = game.garageCars[bodyId];
+
+        game.raceMessage =
+            game.playerCar.name + " selected!";
+
         game.raceMessageTimer = 2;
-        return;
-    }
 
-    game.playerCar = game.garageCars[bodyId];
-
-    game.raceMessage =
-        game.playerCar.name + " selected!";
-
-    game.raceMessageTimer = 2;
-
-    SaveSystem.save(game);
+        SaveSystem.save(game);
     }
 };

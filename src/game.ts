@@ -58,9 +58,15 @@ export const Game = {
             this.money = save.money ?? 0;
             this.ownedCars = save.ownedCars ?? ["maruMk5"];
 
-            this.garageCars = save.garageCars ?? {
+            const defaultGarageCars = {
                 maruMk5: Garage.getMaruMk5(),
-                swagGG2: Garage.getSwagGG2()
+                swagGG2: Garage.getSwagGG2(),
+				rouletteBlair: Garage.getRouletteBlair()
+            };
+			
+			this.garageCars = {
+                ...defaultGarageCars,
+                ...(save.garageCars ?? {})
             };
 
             this.playerCar =
@@ -70,7 +76,9 @@ export const Game = {
         else {
             this.garageCars = {
                 maruMk5: Garage.getMaruMk5(),
-                swagGG2: Garage.getSwagGG2()
+                swagGG2: Garage.getSwagGG2(),
+				rouletteBlair: Garage.getRouletteBlair()
+
             };
 
             this.playerCar = this.garageCars.maruMk5;
@@ -100,13 +108,25 @@ export const Game = {
 
         const aiChoices = [
             Garage.getMaruMk5,
-            Garage.getSwagGG2
+            Garage.getSwagGG2,
+			Garage.getRouletteBlair
         ];
 
         const aiFactory =
             aiChoices[Math.floor(Math.random() * aiChoices.length)];
 
         this.aiCar = aiFactory.call(Garage);
+		
+		const aiRimStyles = [
+            "classic5",
+            "split6",
+            "mesh",
+            "deepDish",
+            "star"
+        ];
+
+this.aiCar.rimStyle =
+    aiRimStyles[Math.floor(Math.random() * aiRimStyles.length)];
 
         const aiColors = [
             "#ffffff", "#ff3333", "#33aaff", "#33ff66",

@@ -3,7 +3,20 @@ export const Customize = {
     needlePrice: 25,
     hubPrice: 25,
     textPrice: 25,
+    rimPrice: 150,
     paintPrice: 75,
+    buyRimStyle(game, style) {
+        if (game.money < this.rimPrice) {
+            game.raceMessage = "Not enough money!";
+            game.raceMessageTimer = 2;
+            return;
+        }
+        game.money -= this.rimPrice;
+        game.playerCar.rimStyle = style;
+        SaveSystem.save(game);
+        game.raceMessage = "Rims changed!";
+        game.raceMessageTimer = 2;
+    },
     buyNeedleColor(game, color) {
         if (!game.playerCar)
             return;
