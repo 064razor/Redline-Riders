@@ -1,3 +1,38 @@
+function calculateTopSpeed(
+    maxRPM: number,
+    topGearRatio: number,
+    finalDrive: number
+) {
+    return Math.floor(
+        maxRPM / (topGearRatio * finalDrive * 330) * 20
+    );
+}
+
+function calculateGearMaxSpeeds(
+    maxRPM: number,
+    gearRatios: number[],
+    finalDrive: number
+) {
+    return gearRatios.map((ratio) =>
+        Math.floor(maxRPM / (ratio * finalDrive * 330)) * 20
+    );
+}
+
+export function refreshDrivetrain(car: any) {
+
+    car.topSpeed = calculateTopSpeed(
+        car.maxRPM,
+        car.gearRatios[car.gearRatios.length - 1],
+        car.finalDrive
+    );
+
+    car.gearMaxSpeeds = calculateGearMaxSpeeds(
+        car.maxRPM,
+        car.gearRatios,
+        car.finalDrive
+    );
+}
+
 export const Garage = {
 
     getStarter() {
@@ -13,14 +48,27 @@ export const Garage = {
 			engineLevel: 0,
             tireLevel: 0,
             transmissionLevel: 0,
+			exhaustLevel: 0,
+            ecuLevel: 0,
+            weightReductionLevel: 0,
+            suspensionLevel: 0,
+            flywheelLevel: 0,
 
             enginePrice: 400,
             tirePrice: 230,
             transmissionPrice: 350,
+			exhaustPrice: 180,
+            ecuPrice: 260,
+            weightReductionPrice: 320,
+            suspensionPrice: 195,
+            flywheelPrice: 300,
 
             hp: 120,
+			torque: 115,
             weight: 2400,
+			baseWeight: 2400,
             grip: 1,
+			launchGrip: 4.5,
 
             spd: 0,
             pos: 0,
@@ -32,19 +80,21 @@ export const Garage = {
             powerbandMax: 6500,
 
             gears: 6,
-            topSpeed: 132,
-            gearRatios: [3.40, 1.95, 1.38, 1.16, 0.99, 0.81],
-            gearMaxSpeeds: [
-                38,
-                62,
-                88,
-                112,
-                124,
-                132
-            ],
+            topSpeed: calculateTopSpeed(
+               7000,
+               0.93,
+               3.45
+            ),
 			
-            finalDrive: 3.90,
-
+            gearRatios: [3.10, 2.05, 1.48, 1.18, 0.98, 0.82],
+            
+			gearMaxSpeeds: calculateGearMaxSpeeds(
+                7000,
+                [3.40, 1.95, 1.38, 0.96, 0.79, 0.64],
+                3.45
+            ),
+			
+            finalDrive: 2.5,
             shiftSpeed: 0.3,
             shiftTimer: 0,
             shiftRPMDrop: false,
@@ -67,14 +117,27 @@ export const Garage = {
 			engineLevel: 0,
             tireLevel: 0,
             transmissionLevel: 0,
+			exhaustLevel: 0,
+            ecuLevel: 0,
+            weightReductionLevel: 0,
+            suspensionLevel: 0,
+            flywheelLevel: 0,
 
-            enginePrice: 320,
             tirePrice: 195,
             transmissionPrice: 600,
+			enginePrice: 400,
+			exhaustPrice: 130,
+            ecuPrice: 275,
+            weightReductionPrice: 300,
+            suspensionPrice: 150,
+            flywheelPrice: 340,
 
             hp: 110,
+			torque: 105,
             weight: 2050,
+			baseWeight: 2050,
             grip: 0.82,
+			launchGrip: 4.5,
 
             spd: 0,
             pos: 0,
@@ -87,18 +150,21 @@ export const Garage = {
 
             gears: 5,
 			
-			topSpeed: 125,
-            gearRatios: [3.45, 1.94, 1.29, 0.97, 0.80],
-            gearMaxSpeeds: [
-                 34,
-                 58,
-                 79,
-                 101,
-                 125
-            ],
+			topSpeed: calculateTopSpeed(
+               6100,
+               0.80,
+               3.57
+            ),
 			
-            finalDrive: 3.67,
-
+            gearRatios: [3.45, 1.94, 1.29, 0.97, 0.80],
+            
+			gearMaxSpeeds: calculateGearMaxSpeeds(
+                6100,
+                [3.45, 1.94, 1.29, 0.97, 0.80],
+                3.57
+            ),
+			
+            finalDrive: 2.57,
             shiftSpeed: 0.42,
             shiftTimer: 0,
             shiftRPMDrop: false,
@@ -121,14 +187,27 @@ export const Garage = {
 		engineLevel: 0,
         tireLevel: 0,
         transmissionLevel: 0,
+		exhaustLevel: 0,
+        ecuLevel: 0,
+        weightReductionLevel: 0,
+        suspensionLevel: 0,
+        flywheelLevel: 0,
 
         enginePrice: 275,
         tirePrice: 700,
         transmissionPrice: 350,
+		exhaustPrice: 180,
+        ecuPrice: 360,
+        weightReductionPrice: 520,
+        suspensionPrice: 250,
+        flywheelPrice: 300,
 
         hp: 285,
+		torque: 340,
         weight: 4131,
-        grip: 0.62,
+		baseWeight: 4131,
+        grip: 0.52,
+		launchGrip: 2.5,
 
         spd: 0,
         pos: 0,
@@ -142,7 +221,11 @@ export const Garage = {
 
         gears: 4,
 
-        topSpeed: 168,
+        topSpeed: calculateTopSpeed(
+           5400,
+           0.92,
+           2.07
+        ),
 
         gearRatios: [
             2.60,
@@ -151,15 +234,13 @@ export const Garage = {
             0.92
         ],
 
-        gearMaxSpeeds: [
-            52,
-            92,
-            132,
-            168
-        ],
+        gearMaxSpeeds: calculateGearMaxSpeeds(
+            5400,
+            [2.60, 1.72, 1.18, 0.92],
+            2.07
+        ),
 
-        finalDrive: 3.08,
-
+        finalDrive: 1.57,
         shiftSpeed: 0.62,
         shiftTimer: 0,
         shiftRPMDrop: false,

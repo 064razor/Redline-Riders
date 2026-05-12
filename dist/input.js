@@ -10,12 +10,12 @@ export const Input = {
             }
             // ===== SHIFT =====
             if (e.code === "Space") {
-                // ✅ only shift during race
+                if (e.repeat)
+                    return;
+                // Only shift during race
                 if (!game.raceStarted)
                     return;
                 this.shift(game.playerCar, game);
-                if (e.repeat)
-                    return;
             }
         });
         document.addEventListener("keyup", (e) => {
@@ -25,42 +25,67 @@ export const Input = {
         });
     },
     shift(car, game) {
-        if (!car || car.shiftTimer > 0)
+        if (!car)
+            return;
+        if (car.shiftTimer > 0)
             return;
         if (car.gear >= car.gearRatios.length)
             return;
+        const currentGearMaxSpeed = car.gearMaxSpeeds[car.gear - 1] / 20;
+        const currentGearProgress = car.spd / currentGearMaxSpeed;
+        // Prevent panic-spamming straight into high gear at low speed.
+        if (car.gear > 1 && currentGearProgress < 0.35) {
+            UI.triggerShiftFeedback("STALLING!");
+            return;
+        }
         let result = "";
-        let bonus = 1;
         const rpm = car.rpm;
+        // ===== SHIFT QUALITY =====
         if (rpm < car.powerbandMin) {
             result = "EARLY";
-            bonus = 0.96;
         }
         else if (rpm < car.powerbandMax * 0.92) {
             result = "GOOD";
-            bonus = 1.04;
         }
         else if (rpm <= car.powerbandMax) {
             result = "PERFECT";
-            bonus = 1.10;
         }
         else {
             result = "LATE";
-            bonus = 0.92;
         }
+        // ===== GEAR RATIO RPM DROP =====
+        const oldGearRatio = car.gearRatios[car.gear - 1];
         car.gear++;
-        car.shiftTimer = 0.5;
-        car.shiftRPMDrop = true;
-        car.spd *= bonus;
-        if (result === "GOOD")
-            game.bonusReward += 2;
-        if (result === "PERFECT")
-            game.bonusReward += 5;
-        if (result === "GOOD") {
+        const newGearRatio = car.gearRatios[car.gear - 1];
+        const ratioDrop = newGearRatio / oldGearRatio;
+        car.rpm *= ratioDrop;
+        if (car.rpm < 1000) {
+            car.rpm = 1000;
+        }
+        if (car.rpm > car.maxRPM) {
+            car.rpm = car.maxRPM;
+        }
+        // ===== SHIFT DELAY =====
+        car.shiftTimer =
+            car.shiftSpeed || 0.5;
+        // Physics now handles RPM naturally by gear speed range.
+        car.shiftRPMDrop = false;
+        // ===== MOMENTUM EFFECT =====
+        // Shifting should not act like a huge speed boost.
+        // These are small feel adjustments only.
+        if (result === "EARLY") {
+            car.spd *= 0.985;
+        }
+        else if (result === "GOOD") {
+            car.spd *= 1.003;
             game.bonusReward += 2;
         }
-        if (result === "PERFECT") {
+        else if (result === "PERFECT") {
+            car.spd *= 1.006;
             game.bonusReward += 5;
+        }
+        else {
+            car.spd *= 0.975;
         }
         UI.triggerShiftFeedback(result);
     }

@@ -1,4 +1,5 @@
 import { SaveSystem } from "./save.js";
+import { Menu } from "./menu.js";
 import { Shop } from "./shop.js";
 import { Garage } from "./garage.js";
 import { UI } from "./ui.js";
@@ -26,10 +27,13 @@ export const Game = {
     raceMessage: "",
     raceMessageTimer: 0,
     raceTime: 0,
-    playerFinishTime: 0,
-    aiFinishTime: 0,
     raceReward: 0,
     bonusReward: 0,
+    difficultyMultiplier: 1,
+    distanceMultiplier: 1,
+    playerFinishTime: 0,
+    aiFinishTime: 0,
+    totalReward: 0,
     raceSummaryVisible: false,
     aiLaunchRPM: 0,
     aiShiftPoint: 0,
@@ -74,10 +78,24 @@ export const Game = {
         this.aiFinishTime = 0;
         this.raceReward = 0;
         this.bonusReward = 0;
+        this.totalReward = 0;
         this.raceSummaryVisible = false;
         this.launchBonusAwarded = false;
+        Menu.hideAll();
         const trackSelect = document.getElementById("trackSelect");
         this.trackLength = Number(trackSelect.value);
+        if (this.trackLength <= 40) {
+            this.distanceMultiplier = 1;
+        }
+        else if (this.trackLength <= 80) {
+            this.distanceMultiplier = 1.25;
+        }
+        else if (this.trackLength <= 140) {
+            this.distanceMultiplier = 1.6;
+        }
+        else {
+            this.distanceMultiplier = 2;
+        }
         this.raceMessage = "";
         this.raceMessageTimer = 0;
         const aiChoices = [
@@ -124,6 +142,13 @@ export const Game = {
         this.aiFinished = false;
         const difficultySelect = document.getElementById("difficultySelect");
         const difficulty = difficultySelect.value;
+        this.difficultyMultiplier = 1;
+        if (difficulty === "normal") {
+            this.difficultyMultiplier = 1.25;
+        }
+        if (difficulty === "hard") {
+            this.difficultyMultiplier = 1.5;
+        }
         if (difficulty === "easy") {
             this.aiLaunchRPM = this.aiCar.powerbandMin - 500;
             this.aiShiftPoint = this.aiCar.powerbandMax * 0.88;
@@ -236,16 +261,18 @@ export const Game = {
                     this.raceStarted = false;
                     const playerWon = this.playerFinishTime <= this.aiFinishTime;
                     if (playerWon) {
-                        this.money += 100;
                         this.raceReward = 100;
-                        this.raceMessage = "You won! +$100";
                     }
                     else {
-                        this.money += 25;
                         this.raceReward = 25;
-                        this.raceMessage = "You lost! +$25";
                     }
-                    this.money += this.bonusReward;
+                    this.totalReward = Math.floor((this.raceReward + this.bonusReward)
+                        * this.difficultyMultiplier
+                        * this.distanceMultiplier);
+                    this.money += this.totalReward;
+                    this.raceMessage = playerWon
+                        ? "You won! +$" + this.totalReward
+                        : "You lost! +$" + this.totalReward;
                     SaveSystem.save(this);
                     this.raceMessageTimer = 3;
                     this.raceSummaryVisible = true;

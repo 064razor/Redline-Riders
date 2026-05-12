@@ -1,6 +1,7 @@
 import { SaveSystem } from "./save.js";
 import { Dealer } from "./dealer.js";
 import { Game } from "./game.js";
+import { Menu } from "./menu.js";
 import { Input } from "./input.js";
 import { Garage } from "./garage.js";
 import { UI } from "./ui.js";
@@ -12,6 +13,11 @@ function syncShopUI() {
     const tireBtn = document.getElementById("buyTires") as HTMLButtonElement;
     const engineBtn = document.getElementById("buyEngine") as HTMLButtonElement;
     const transmissionBtn = document.getElementById("buyTransmission") as HTMLButtonElement;
+	const exhaustBtn = document.getElementById("buyExhaust") as HTMLButtonElement;
+    const ecuBtn = document.getElementById("buyECU") as HTMLButtonElement;
+    const weightReductionBtn = document.getElementById("buyWeightReduction") as HTMLButtonElement;
+    const suspensionBtn = document.getElementById("buySuspension") as HTMLButtonElement;
+    const flywheelBtn = document.getElementById("buyFlywheel") as HTMLButtonElement;
     const dealerBtn = document.getElementById("dealerBtn") as HTMLButtonElement;
     const dealerPanel = document.getElementById("dealerPanel") as HTMLDivElement;
     const needleBtn = document.getElementById("buyNeedleColor") as HTMLButtonElement;
@@ -24,6 +30,11 @@ function syncShopUI() {
     tireBtn.innerText = `Buy Tires (+1 Grip) ($${Game.playerCar.tirePrice})`;
     engineBtn.innerText = `Buy Engine (+25 HP) ($${Game.playerCar.enginePrice})`;
     transmissionBtn.innerText = `Transmission Upgrade (+Top Speed) ($${Game.playerCar.transmissionPrice})`;
+	exhaustBtn.innerText = `Buy Exhaust (+8 HP) ($${Game.playerCar.exhaustPrice})`;
+    ecuBtn.innerText = `Buy ECU (+5 HP / +150 RPM) ($${Game.playerCar.ecuPrice})`;
+    weightReductionBtn.innerText = `Weight Reduction (-120 lbs) ($${Game.playerCar.weightReductionPrice})`;
+    suspensionBtn.innerText = `Suspension (+0.08 Grip) ($${Game.playerCar.suspensionPrice})`;
+    flywheelBtn.innerText = `Flywheel (-Shift Time) ($${Game.playerCar.flywheelPrice})`;
 
     needleBtn.innerText = `Change ($${Customize.needlePrice})`;
     hubBtn.innerText = `Change ($${Customize.hubPrice})`;
@@ -113,12 +124,6 @@ loadSlotBtn.onclick = () => {
     Game.raceMessageTimer = 2;
 };
 
-dealerBtn.onclick = () => {
-    dealerPanel.style.display =
-        dealerPanel.style.display === "none" ? "block" : "none";
-
-    syncDealerUI();
-};
 
 document.getElementById("startBtn")!.onclick = () => {
     Game.start();
@@ -148,24 +153,36 @@ syncShopUI();
     syncShopUI();
 };
 
-(document.getElementById("optionsBtn") as HTMLButtonElement)
+(document.getElementById("buyExhaust") as HTMLButtonElement)
 .onclick = () => {
-	
-
-
-    const panel =
-        document.getElementById("optionsPanel")!;
-
-    if (panel.style.display === "none") {
-
-        panel.style.display = "block";
-    }
-    else {
-
-        panel.style.display = "none";
-    }
+    Shop.buyExhaust(Game);
+    syncShopUI();
 };
 
+(document.getElementById("buyECU") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyECU(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buyWeightReduction") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyWeightReduction(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buySuspension") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buySuspension(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buyFlywheel") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyFlywheel(Game);
+    syncShopUI();
+};
+	
 const rimBtn =
     document.getElementById("buyRimStyle") as HTMLButtonElement;
 
@@ -241,20 +258,57 @@ rimBtn.onclick = () => {
     syncShopUI();
 };
 
+function makeBar(label: string, value: number, max: number, suffix = "") {
+    const percent = Math.min(100, Math.max(0, (value / max) * 100));
+
+    return `
+        <div style="margin: 8px 0;">
+            <div style="display:flex; justify-content:space-between;">
+                <span>${label}</span>
+                <span>${value}${suffix}</span>
+            </div>
+            <div style="height:10px; background:#222; border:1px solid #444;">
+                <div style="
+                    height:100%;
+                    width:${percent}%;
+                    background:linear-gradient(90deg, #33ff33, #ffff33, #ff3333);
+                "></div>
+            </div>
+        </div>
+    `;
+}
+
+function syncGarageUI() {
+    const garageInfo = document.getElementById("garageInfo") as HTMLDivElement;
+    if (!garageInfo || !Game.playerCar) return;
+
+    const car = Game.playerCar;
+
+    garageInfo.innerHTML = `
+        <div><b>${car.name}</b></div>
+        <div style="margin-bottom:10px;">Current selected car</div>
+
+        ${makeBar("Horsepower", car.hp, 800, " HP")}
+        ${makeBar("Grip", Number(car.grip.toFixed(2)), 3)}
+        ${makeBar("Weight", car.weight, 5000, " lbs")}
+        ${makeBar("Top Speed", car.topSpeed, 250, " MPH")}
+        ${makeBar("Max RPM", car.maxRPM, 10000, " RPM")}
+        ${makeBar("Shift Speed", Number(car.shiftSpeed.toFixed(2)), 1, "s")}
+    `;
+}
+
 const customizeBtn = document.getElementById("customizeBtn") as HTMLButtonElement;
 const customizePanel = document.getElementById("customizePanel") as HTMLDivElement;
 
-customizeBtn.onclick = () => {
-    customizePanel.style.display =
-        customizePanel.style.display === "none" ? "block" : "none";
-};
 
 const save = SaveSystem.load();
 
 // TEMP bridge so your HTML button still works
 (window as any).Game = Game;
+(window as any).syncGarageUI = syncGarageUI;
 
 // Initialize systems
+Menu.init();
 syncShopUI();
 syncDealerUI();
 Input.init(Game);

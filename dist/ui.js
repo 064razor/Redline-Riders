@@ -32,7 +32,16 @@ export const UI = {
             "Transmission Upgrade (+Top Speed) ($" + game.playerCar.transmissionPrice + ")";
         // ✅ ADD THIS
         this.drawTach(player, game);
-        this.updateRaceSummary(game);
+        if (game.raceSummaryVisible) {
+            this.updateRaceSummary(game);
+        }
+        else {
+            const summary = document.getElementById("raceSummary");
+            if (summary) {
+                summary.classList.add("hidden");
+                summary.style.display = "none";
+            }
+        }
     },
     triggerShiftFeedback(state) {
         this.shiftState = state;
@@ -125,29 +134,41 @@ export const UI = {
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius + 8, powerbandEndAngle, endAngle);
         ctx.stroke();
-        // ===== DRAW GEAR MARKERS & NUMBERS =====
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 14px Arial";
+        // ===== DRAW RPM MARKERS & NUMBERS =====
+        ctx.fillStyle = car.tachTextColor || "#ffffff";
+        ctx.font = "bold 12px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        for (let gear = 1; gear <= 7; gear++) {
-            const angle = startAngle + (gear - 1) * (Math.PI / 6); // 7 gears across 180 degrees
-            const x = centerX + Math.cos(angle) * radius;
-            const y = centerY + Math.sin(angle) * radius;
-            // Draw tick mark
-            ctx.strokeStyle = "#aaa";
-            ctx.lineWidth = gear === car.gear ? 3 : 1;
-            ctx.beginPath();
-            const tickStart = radius - 8;
+        // Small ticks every 500 RPM
+        for (let rpm = 500; rpm <= car.maxRPM; rpm += 500) {
+            const ratio = rpm / car.maxRPM;
+            const angle = startAngle + ratio * Math.PI;
+            const isMajorTick = rpm % 1000 === 0;
+            ctx.strokeStyle = rpm >= car.powerbandMax ? "#ff3333" : "#aaa";
+            ctx.lineWidth = isMajorTick ? 2 : 1;
+            const tickStart = isMajorTick ? radius - 11 : radius - 6;
             const tickEnd = radius + 3;
+            ctx.beginPath();
             ctx.moveTo(centerX + Math.cos(angle) * tickStart, centerY + Math.sin(angle) * tickStart);
             ctx.lineTo(centerX + Math.cos(angle) * tickEnd, centerY + Math.sin(angle) * tickEnd);
             ctx.stroke();
-            // Draw number
-            ctx.fillStyle = "#fff";
-            const numX = centerX + Math.cos(angle) * (radius + 18);
-            const numY = centerY + Math.sin(angle) * (radius + 18);
-            ctx.fillText(gear.toString(), numX, numY);
+        }
+        // Numbers every 1000 RPM
+        for (let rpm = 1000; rpm <= car.maxRPM; rpm += 1000) {
+            const ratio = rpm / car.maxRPM;
+            const angle = startAngle + ratio * Math.PI;
+            const number = rpm / 1000;
+            ctx.fillStyle = rpm >= car.powerbandMax
+                ? "#ff6666"
+                : (car.tachTextColor || "#ffffff");
+            ctx.fillText(number.toString(), centerX + Math.cos(angle) * (radius + 19), centerY + Math.sin(angle) * (radius + 19));
+        }
+        // Show exact max RPM if not cleanly divisible
+        if (car.maxRPM % 1000 !== 0) {
+            const angle = endAngle;
+            const number = (car.maxRPM / 1000).toFixed(1);
+            ctx.fillStyle = "#ff6666";
+            ctx.fillText(number, centerX + Math.cos(angle) * (radius + 19), centerY + Math.sin(angle) * (radius + 19));
         }
         // ===== SHIFT FEEDBACK TIMER =====
         if (this.shiftTimer > 0) {
@@ -270,14 +291,7 @@ export const UI = {
     },
     drawShiftIndicator(ctx, x, y) { },
     updateRaceSummary(game) {
-        const panel = document.getElementById("raceSummary");
-        if (!panel)
-            return;
-        if (!game.raceSummaryVisible) {
-            panel.style.display = "none";
-            return;
-        }
-        panel.style.display = "block";
+        const summary = document.getElementById("raceSummary");
         const title = document.getElementById("summaryTitle");
         const playerTime = document.getElementById("summaryPlayerTime");
         const aiTime = document.getElementById("summaryAiTime");
@@ -286,6 +300,8 @@ export const UI = {
         const playerWon = game.playerFinishTime > 0 &&
             game.aiFinishTime > 0 &&
             game.playerFinishTime <= game.aiFinishTime;
+        summary.classList.remove("hidden");
+        summary.style.display = "block";
         title.innerText = playerWon ? "Victory!" : "Defeat";
         playerTime.innerText =
             "Player Time: " +
@@ -298,9 +314,12 @@ export const UI = {
                 ? "Difference: Finished ahead"
                 : "Difference: Opponent finished first";
         reward.innerText =
-            "Reward: +$" + game.raceReward +
-                " | Bonus: +$" + game.bonusReward +
-                " | Total: +$" + (game.raceReward + game.bonusReward);
+            reward.innerText =
+                "Race Reward: +$" + game.raceReward + "\n" +
+                    "Launch Bonus: +$" + game.bonusReward + "\n" +
+                    "Difficulty Multiplier: x" + game.difficultyMultiplier + "\n" +
+                    "Distance Multiplier: x" + game.distanceMultiplier + "\n" +
+                    "Total Cash Earned: +$" + game.totalReward;
     },
     drawExtras(car) { }
 };

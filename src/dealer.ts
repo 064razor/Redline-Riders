@@ -20,7 +20,7 @@ export const Dealer = {
         },
         {
             bodyId: "rouletteBlair",
-            price: 120,
+            price: 2100,
             displayName: Bodywork.cars.rouletteBlair.displayName,
             description: "Heavy, but powerful. Built for the drag strip."
         }

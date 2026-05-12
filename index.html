@@ -7,21 +7,149 @@
         body {
             background: black;
             color: white;
-            font-family: Orbitron, sans-serif;
+            font-family: Orbitron, Arial, sans-serif;
             text-align: center;
+            margin: 0;
+            padding: 0 12px 30px;
+        }
+
+        h1 {
+            margin-top: 18px;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
         }
 
         button {
-            background: #111;
+            background: linear-gradient(#1b1b1b, #070707);
             color: white;
-            border: 1px solid #444;
+            border: 1px solid #555;
             padding: 10px 20px;
             cursor: pointer;
+            font-weight: bold;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 2px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        button:hover {
+            border-color: #ff3333;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 0 8px rgba(255, 50, 50, 0.75);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow:
+                inset 0 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 4px rgba(255, 50, 50, 0.5);
+        }
+
+        select,
+        input[type="color"] {
+            background: #eee;
+            color: black;
+            border: 1px solid #777;
+            padding: 4px;
         }
 
         canvas {
             background: #111;
             margin-top: 10px;
+            vertical-align: top;
+        }
+
+        #mainMenu {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 12px auto 16px;
+            flex-wrap: wrap;
+            max-width: 900px;
+        }
+
+        .menuPanel {
+            border: 1px solid #444;
+            background: #111;
+            width: 520px;
+            max-width: 92%;
+            margin: 10px auto;
+            padding: 14px;
+            line-height: 1.8;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .panelTitle {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .buttonRow {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        #raceMessage {
+            font-size: 28px;
+            font-weight: bold;
+            color: #33ff33;
+            height: 40px;
+            margin-top: 10px;
+        }
+
+        #raceSummary {
+            border: 1px solid #444;
+            background: #111;
+            color: white;
+            width: 320px;
+            max-width: 90%;
+            margin: 10px auto;
+            padding: 12px;
+            line-height: 1.6;
+        }
+
+        #summaryTitle {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #controls {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        #gameArea {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        #shiftMsg {
+            height: 25px;
+        }
+
+        #countdown {
+            position: absolute;
+            top: 140px;
+            left: 66%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            pointer-events: none;
+            z-index: 10;
         }
     </style>
 </head>
@@ -30,162 +158,119 @@
 
 <h1>Redline Riders: Alpha</h1>
 
-<div>
-    <label>Track Length:</label>
-    <select id="trackSelect">
-        <option value="40">Short</option>
-        <option value="80" selected>Medium</option>
-        <option value="140">Long</option>
-        <option value="220">Extreme</option>
-    </select>
+<div id="mainMenu">
+    <button id="raceMenuBtn">Race</button>
+    <button id="garageMenuBtn">Garage</button>
+    <button id="upgradeMenuBtn">Upgrades</button>
+    <button id="dealerMenuBtn">Dealership</button>
+    <button id="customizeMenuBtn">Customize</button>
+    <button id="optionsMenuBtn">Options</button>
+    <button id="saveMenuBtn">Save / Load</button>
 </div>
 
-<div>
-    <label>Difficulty:</label>
-    <select id="difficultySelect">
-        <option value="easy">Easy</option>
-        <option value="normal" selected>Normal</option>
-        <option value="hard">Hard</option>
-    </select>
-</div>
+<div id="racePanel" class="menuPanel hidden">
+    <div class="panelTitle">Race Setup</div>
 
-<button id="startBtn">Start Race</button>
-<button id="optionsBtn">Options</button>
-
-<div id="optionsPanel" style="display:none; margin-top:10px;">
-    <label>Speed Unit:</label>
-    <select id="unitSelect">
-        <option value="MPH">MPH</option>
-        <option value="KMH">KM/H</option>
-    </select>
-
-    <br><br>
-
-    <label>Player Lane:</label>
-    <select id="laneSelect">
-        <option value="top">Top</option>
-        <option value="bottom" selected>Bottom</option>
-    </select>
-
-    <br><br>
-
-    <label>Race Direction:</label>
-    <select id="directionSelect">
-        <option value="right" selected>Right</option>
-        <option value="left">Left</option>
-    </select>
-</div>
-
-<div id="controls" style="
-    margin-top: 10px;
-    font-size: 14px;
-    color: #ccc;
-    line-height: 1.6;
-">
-    <div><b>Controls:</b></div>
-    <div>↑ Hold = Rev engine</div>
-    <div>Space = Shift gear</div>
-</div>
-
-<div id="raceMessage" style="
-    font-size: 28px;
-    font-weight: bold;
-    color: #33ff33;
-    height: 40px;
-    margin-top: 10px;
-"></div>
-
-<div id="raceSummary" style="
-    display:none;
-    border:1px solid #444;
-    background:#111;
-    color:white;
-    width:300px;
-    margin:10px auto;
-    padding:12px;
-    line-height:1.6;
-">
-    <div id="summaryTitle" style="font-size:24px; font-weight:bold;"></div>
-    <div id="summaryPlayerTime"></div>
-    <div id="summaryAiTime"></div>
-    <div id="summaryDifference"></div>
-    <div id="summaryReward"></div>
-</div>
-
-<div id="rpm"></div>
-<div id="speed"></div>
-<div id="gear"></div>
-<div id="money">$0</div>
-
-<div style="margin-top: 10px;">
-    <button id="buyTires"></button>
-    <button id="buyEngine"></button>
-    <button id="buyTransmission"></button>
-    <button id="customizeBtn">Customize</button>
-</div>
-
-<div style="margin-top: 10px;">
-    <button id="dealerBtn">Dealership</button>
-</div>
-
-<div style="margin-top:10px;">
-    <button id="saveBtn">Save Game</button>
-
-    <select id="saveSlotSelect">
-        <option value="1">Slot 1</option>
-        <option value="2">Slot 2</option>
-        <option value="3">Slot 3</option>
-        <option value="4">Slot 4</option>
-        <option value="5">Slot 5</option>
-    </select>
-
-    <button id="loadSlotBtn">Load Slot</button>
-</div>
-
-<div id="dealerPanel" style="
-    display:none;
-    border:1px solid #444;
-    background:#111;
-    width:420px;
-    margin:10px auto;
-    padding:12px;
-    line-height:1.8;
-">
-    <div style="font-weight:bold; font-size:18px; margin-bottom:8px;">
-        Dealership
+    <div>
+        <label>Track Length:</label>
+        <select id="trackSelect">
+            <option value="40">Short</option>
+            <option value="80" selected>Medium</option>
+            <option value="140">Long</option>
+            <option value="220">Extreme</option>
+        </select>
     </div>
 
+    <div>
+        <label>Difficulty:</label>
+        <select id="difficultySelect">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+        </select>
+    </div>
+
+    <div class="buttonRow">
+        <button id="startBtn">Start Race</button>
+    </div>
+
+    <div id="controls">
+        <div><b>Controls:</b></div>
+        <div>↑ Hold = Rev engine</div>
+        <div>Space = Shift gear</div>
+    </div>
+</div>
+
+<div id="garagePanel" class="menuPanel hidden">
+    <div class="panelTitle">Garage</div>
+    <div id="garageInfo">Your owned cars are managed through the dealership for now.</div>
+</div>
+
+<div id="upgradePanel" class="menuPanel hidden">
+    <div class="panelTitle">Upgrades</div>
+
+    <div class="panelTitle" style="margin-top:12px;">Power</div>
+
+    <div class="buttonRow">
+        <button id="buyEngine"></button>
+        <button id="buyExhaust"></button>
+        <button id="buyECU"></button>
+    </div>
+
+    <div class="buttonRow">
+        <button id="buyPistons"></button>
+        <button id="buyCrank"></button>
+        <button id="buyIntake"></button>
+    </div>
+
+    <div class="buttonRow">
+        <button id="buyTopEnd"></button>
+        <button id="buyBottomEnd"></button>
+    </div>
+
+    <div class="panelTitle" style="margin-top:18px;">Grip</div>
+
+    <div class="buttonRow">
+        <button id="buyTires"></button>
+        <button id="buySuspension"></button>
+        <button id="buyWeightReduction"></button>
+    </div>
+
+    <div class="panelTitle" style="margin-top:18px;">Drivetrain</div>
+
+    <div class="buttonRow">
+        <button id="buyTransmission"></button>
+        <button id="buyFlywheel"></button>
+    </div>
+</div>
+
+<div id="dealerPanel" class="menuPanel hidden">
+    <div class="panelTitle">Dealership</div>
     <div id="dealerListings"></div>
 </div>
 
-<div id="customizePanel" style="
-    display:none;
-    border:1px solid #444;
-    background:#111;
-    width:360px;
-    margin:10px auto;
-    padding:12px;
-    line-height:2;
-">
+<div id="customizePanel" class="menuPanel hidden">
+    <div class="panelTitle">Customization</div>
 
-<select id="rimStyleSelect">
-    <option value="classic5">Classic 5-Spoke</option>
-    <option value="split6">Split 6-Spoke</option>
-    <option value="mesh">Street Mesh</option>
-    <option value="deepDish">Deep Dish</option>
-    <option value="star">Star Racer</option>
-</select>
-
-<button id="buyRimStyle">Buy Rims</button>
-
-<div>
-    <label>Car Paint:</label>
-    <input id="paintColorPicker" type="color" value="#ffffff">
-    <button id="buyPaintColor"></button>
-</div>
-    <div style="font-weight:bold; margin-bottom:8px;">
-        Tachometer Customization
+    <div>
+        <label>Rims:</label>
+        <select id="rimStyleSelect">
+            <option value="classic5">Classic 5-Spoke</option>
+            <option value="split6">Split 6-Spoke</option>
+            <option value="mesh">Street Mesh</option>
+            <option value="deepDish">Deep Dish</option>
+            <option value="star">Star Racer</option>
+        </select>
+        <button id="buyRimStyle">Buy Rims</button>
     </div>
+
+    <div>
+        <label>Car Paint:</label>
+        <input id="paintColorPicker" type="color" value="#ffffff">
+        <button id="buyPaintColor"></button>
+    </div>
+
+    <div class="panelTitle" style="margin-top:12px;">Tachometer Customization</div>
 
     <div>
         <label>Needle:</label>
@@ -206,22 +291,73 @@
     </div>
 </div>
 
-<div id="shiftMsg" style="height: 25px;"></div>
+<div id="optionsPanel" class="menuPanel hidden">
+    <div class="panelTitle">Options</div>
 
-<canvas id="gameCanvas" width="900" height="220"></canvas>
-<canvas id="tachCanvas" width="300" height="200"></canvas>
+    <div>
+        <label>Speed Unit:</label>
+        <select id="unitSelect">
+            <option value="MPH">MPH</option>
+            <option value="KMH">KM/H</option>
+        </select>
+    </div>
 
-<div id="countdown" style="
-    position:absolute;
-    top:140px;
-    left:66%;
-    transform:translateX(-50%);
-    font-size:48px;
-    font-weight: bold;
-    color:white;
-    pointer-events:none;
-    z-index:10;
-"></div>
+    <div>
+        <label>Player Lane:</label>
+        <select id="laneSelect">
+            <option value="top">Top</option>
+            <option value="bottom" selected>Bottom</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Race Direction:</label>
+        <select id="directionSelect">
+            <option value="right" selected>Right</option>
+            <option value="left">Left</option>
+        </select>
+    </div>
+</div>
+
+<div id="savePanel" class="menuPanel hidden">
+    <div class="panelTitle">Save / Load</div>
+
+    <button id="saveBtn">Save Game</button>
+
+    <select id="saveSlotSelect">
+        <option value="1">Slot 1</option>
+        <option value="2">Slot 2</option>
+        <option value="3">Slot 3</option>
+        <option value="4">Slot 4</option>
+        <option value="5">Slot 5</option>
+    </select>
+
+    <button id="loadSlotBtn">Load Slot</button>
+</div>
+
+<div id="raceMessage"></div>
+
+<div id="raceSummary" class="hidden">
+    <div id="summaryTitle"></div>
+    <div id="summaryPlayerTime"></div>
+    <div id="summaryAiTime"></div>
+    <div id="summaryDifference"></div>
+    <div id="summaryReward"></div>
+</div>
+
+<div id="rpm"></div>
+<div id="speed"></div>
+<div id="gear"></div>
+<div id="money">$0</div>
+
+<div id="shiftMsg"></div>
+
+<div id="gameArea">
+    <canvas id="gameCanvas" width="900" height="220"></canvas>
+    <canvas id="tachCanvas" width="300" height="200"></canvas>
+</div>
+
+<div id="countdown"></div>
 
 <script type="module" src="dist/main.js"></script>
 
