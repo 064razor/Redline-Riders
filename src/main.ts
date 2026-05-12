@@ -4,9 +4,10 @@ import { Game } from "./game.js";
 import { Menu } from "./menu.js";
 import { Input } from "./input.js";
 import { Garage } from "./garage.js";
+import { AudioSystem } from "./audio.js";
+import { Options } from "./options.js";
 import { UI } from "./ui.js";
 import { Shop } from "./shop.js";
-import { Options } from "./options.js";
 import { Customize } from "./customize.js";
 
 function syncShopUI() {
@@ -15,6 +16,11 @@ function syncShopUI() {
     const transmissionBtn = document.getElementById("buyTransmission") as HTMLButtonElement;
 	const exhaustBtn = document.getElementById("buyExhaust") as HTMLButtonElement;
     const ecuBtn = document.getElementById("buyECU") as HTMLButtonElement;
+	const pistonsBtn = document.getElementById("buyPistons") as HTMLButtonElement;
+	const crankBtn = document.getElementById("buyCrank") as HTMLButtonElement;
+	const intakeBtn = document.getElementById("buyIntake") as HTMLButtonElement;
+	const topEndBtn = document.getElementById("buyTopEnd") as HTMLButtonElement;
+	const bottomEndBtn = document.getElementById("buyBottomEnd") as HTMLButtonElement;
     const weightReductionBtn = document.getElementById("buyWeightReduction") as HTMLButtonElement;
     const suspensionBtn = document.getElementById("buySuspension") as HTMLButtonElement;
     const flywheelBtn = document.getElementById("buyFlywheel") as HTMLButtonElement;
@@ -31,10 +37,20 @@ function syncShopUI() {
     engineBtn.innerText = `Buy Engine (+25 HP) ($${Game.playerCar.enginePrice})`;
     transmissionBtn.innerText = `Transmission Upgrade (+Top Speed) ($${Game.playerCar.transmissionPrice})`;
 	exhaustBtn.innerText = `Buy Exhaust (+8 HP) ($${Game.playerCar.exhaustPrice})`;
-    ecuBtn.innerText = `Buy ECU (+5 HP / +150 RPM) ($${Game.playerCar.ecuPrice})`;
+    ecuBtn.innerText = `Buy ECU (+3 HP / +35 RPM) ($${Game.playerCar.ecuPrice})`;
     weightReductionBtn.innerText = `Weight Reduction (-120 lbs) ($${Game.playerCar.weightReductionPrice})`;
     suspensionBtn.innerText = `Suspension (+0.08 Grip) ($${Game.playerCar.suspensionPrice})`;
     flywheelBtn.innerText = `Flywheel (-Shift Time) ($${Game.playerCar.flywheelPrice})`;
+	pistonsBtn.innerText =
+	`Pistons (+10 HP / +6 TQ) ($${Game.playerCar.pistonPrice})`;
+	crankBtn.innerText =
+	`Crank (+6 HP / +12 TQ) ($${Game.playerCar.crankPrice})`;
+	intakeBtn.innerText =
+	`Intake (+4 HP / +3 TQ) ($${Game.playerCar.intakePrice})`;
+	topEndBtn.innerText =
+	`Top End (+6 HP / +75 RPM) ($${Game.playerCar.topEndPrice})`;
+	bottomEndBtn.innerText =
+	`Bottom End (+13 HP / +10 TQ) ($${Game.playerCar.bottomEndPrice})`;
 
     needleBtn.innerText = `Change ($${Customize.needlePrice})`;
     hubBtn.innerText = `Change ($${Customize.hubPrice})`;
@@ -126,6 +142,9 @@ loadSlotBtn.onclick = () => {
 
 
 document.getElementById("startBtn")!.onclick = () => {
+
+    AudioSystem.init();
+
     Game.start();
 };
 
@@ -182,6 +201,36 @@ syncShopUI();
     Shop.buyFlywheel(Game);
     syncShopUI();
 };
+
+(document.getElementById("buyPistons") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyPistons(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buyCrank") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyCrank(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buyIntake") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyIntake(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buyTopEnd") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyTopEnd(Game);
+    syncShopUI();
+};
+
+(document.getElementById("buyBottomEnd") as HTMLButtonElement)
+.onclick = () => {
+    Shop.buyBottomEnd(Game);
+    syncShopUI();
+};
 	
 const rimBtn =
     document.getElementById("buyRimStyle") as HTMLButtonElement;
@@ -195,6 +244,30 @@ rimBtn.onclick = () => {
 
     Customize.buyRimStyle(Game, selector.value);
     syncShopUI();
+};
+
+const muteAudioToggle =
+    document.getElementById("muteAudioToggle") as HTMLInputElement;
+
+const audioVolumeSlider =
+    document.getElementById("audioVolumeSlider") as HTMLInputElement;
+
+const audioVolumeValue =
+    document.getElementById("audioVolumeValue") as HTMLSpanElement;
+
+muteAudioToggle.onchange = () => {
+    Options.audioMuted = muteAudioToggle.checked;
+    AudioSystem.applySettings();
+};
+
+audioVolumeSlider.oninput = () => {
+    Options.audioVolume =
+        Number(audioVolumeSlider.value) / 100;
+
+    audioVolumeValue.innerText =
+        audioVolumeSlider.value + "%";
+
+    AudioSystem.applySettings();
 };
 
 (document.getElementById("unitSelect") as HTMLSelectElement)

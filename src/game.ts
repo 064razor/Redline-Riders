@@ -5,6 +5,8 @@ import { Garage } from "./garage.js";
 import { UI } from "./ui.js";
 import { Render } from "./render.js";
 import { Physics } from "./physics.js";
+import { AudioSystem } from "./audio.js";
+import { Input } from "./input.js";
 
 export const Game = {
     ownedCars: ["maruMk5"],
@@ -302,6 +304,16 @@ this.aiCar.rimStyle =
             if (this.countdownActive) {
                 Physics.update(this.playerCar, 0.016);
             }
+			
+			if (this.countdownActive || this.raceStarted) {
+				AudioSystem.updateEngine(
+					this.playerCar,
+					Input.holdingThrottle
+				);
+		}
+		else {
+			AudioSystem.stopEngine();
+		}
 
             if (this.raceStarted) {
                 this.raceTime += 0.016;
@@ -334,6 +346,8 @@ this.aiCar.rimStyle =
                 ) {
                     this.raceFinished = true;
                     this.raceStarted = false;
+					
+					AudioSystem.stopEngine();
 
                     const playerWon =
                         this.playerFinishTime <= this.aiFinishTime;

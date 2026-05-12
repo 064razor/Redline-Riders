@@ -6,5 +6,8 @@ export const Options = {
 	lane: "bottom",
 	
 	raceDirection: "right",
+	
+	audioMuted: false,
+	audioVolume: 1,
 
 };

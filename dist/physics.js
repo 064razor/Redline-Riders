@@ -95,7 +95,7 @@ export const Physics = {
             const excessAccel = accel - gripLimit;
             const torqueLoad = car.torque / Math.max(car.weight, 1);
             const tractionLoad = torqueLoad / Math.max(car.grip, 0.1);
-            const spinSeverity = Math.min(2.36, tractionLoad * 49);
+            const spinSeverity = Math.min(2.39, tractionLoad * 49);
             const usableSpinPower = Math.max(1.55, 2.18 - (spinSeverity * 1.95));
             accel =
                 gripLimit + (excessAccel * usableSpinPower);

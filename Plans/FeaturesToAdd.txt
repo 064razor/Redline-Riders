@@ -1,43 +1,30 @@
-Visual:
-+More wheel styles
-Do now:
-+Menu overhaul, real main menu instead of series of dropdown list boxes
-
-+Opponents show up with randomized wheels
-+Beveled buttons
-+Highlighted buttons
+Visual: More wheel styles
+All clear!
 
 Gameplay:
 +AI performance scaling to player and difficulty
-+Tachometer numbers to adjust to max rpm's
-+Car drivetrains(Fwd, rwd)
++Car drivetrains(Fwd, rwd, etc)
++Engine types(I4, V8, etc)
 +Car engine types from garage/dealership menus
 +Ability to set custom distance races
 
 Balance:
 +New upgrades
-+Difficulty bonus for races
-+Race distance bonus multiplier
-+Final drive upgrade more impactful
++Ai racers' performance adapt to track, your car and difficulty
 
 Gameplay loop:
-+Exhaust upgrade(small power)
-+ECU upgrade(small power + +55 rpm's)
-+Weight reduction upgrade
-+Suspension(+ extra grip)
-+Flywheel upgrade(Reduced shift time. Upgrade cuts off it it reduces shift time below 0)
+All clear!
 
-Engine broken down to 5 parts:
-Pistons(Power and torque)
-Crank(Power and torque
-Intake(slight power + torque)
-Top end engine
-Bottom end engine
-
-
+Fix:
++Restore results screen UI
 
 Overhaul(Major update/features for the future)
 +Proper fwd/rwd behavior
 +Basic sound
-+Proer car masking
++Proper car paint masking
 +Generic decals
+
+Player feedback:
+Engine Sounds to make it more immersive
+Difficulty actually scaling with cars
+Possibly get more money depending the difficulty? - Done
