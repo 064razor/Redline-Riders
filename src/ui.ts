@@ -439,10 +439,8 @@ if (car.maxRPM % 1000 !== 0) {
     const aiTime = document.getElementById("summaryAiTime")!;
 	const reward = document.getElementById("summaryReward")!;
     const difference = document.getElementById("summaryDifference")!;
-    const playerWon =
-        game.playerFinishTime > 0 &&
-        game.aiFinishTime > 0 &&
-        game.playerFinishTime <= game.aiFinishTime;
+	const playerWon =
+		game.raceReward === 100;
 		
 		summary.classList.remove("hidden");
         summary.style.display = "block";
@@ -456,13 +454,33 @@ if (car.maxRPM % 1000 !== 0) {
     aiTime.innerText =
         "Opponent Time: " +
         (game.aiFinishTime > 0 ? game.aiFinishTime.toFixed(2) + "s" : "DNF");
+	
+			if (game.playerFinishTime > 0 && game.aiFinishTime > 0) {
 
-    difference.innerText =
-        playerWon
-            ? "Difference: Finished ahead"
-            : "Difference: Opponent finished first";
+			const gap =
+				Math.abs(game.playerFinishTime - game.aiFinishTime);
 
-    reward.innerText =
+			difference.innerText =
+				game.playerFinishTime <= game.aiFinishTime
+					? "Difference: Won by " + gap.toFixed(2) + "s"
+					: "Difference: Lost by " + gap.toFixed(2) + "s";
+		}
+		else if (game.playerFinishTime > 0 && game.aiFinishTime <= 0) {
+
+			difference.innerText =
+				"Difference: Opponent still racing...";
+		}
+		else if (game.aiFinishTime > 0 && game.playerFinishTime <= 0) {
+
+			difference.innerText =
+				"Difference: Opponent finished first";
+		}
+		else {
+
+			difference.innerText =
+				"Difference: Waiting...";
+		}
+		
     reward.innerText =
     "Race Reward: +$" + game.raceReward + "\n" +
     "Launch Bonus: +$" + game.bonusReward + "\n" +

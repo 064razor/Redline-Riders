@@ -297,9 +297,7 @@ export const UI = {
         const aiTime = document.getElementById("summaryAiTime");
         const reward = document.getElementById("summaryReward");
         const difference = document.getElementById("summaryDifference");
-        const playerWon = game.playerFinishTime > 0 &&
-            game.aiFinishTime > 0 &&
-            game.playerFinishTime <= game.aiFinishTime;
+        const playerWon = game.raceReward === 100;
         summary.classList.remove("hidden");
         summary.style.display = "block";
         title.innerText = playerWon ? "Victory!" : "Defeat";
@@ -309,17 +307,31 @@ export const UI = {
         aiTime.innerText =
             "Opponent Time: " +
                 (game.aiFinishTime > 0 ? game.aiFinishTime.toFixed(2) + "s" : "DNF");
-        difference.innerText =
-            playerWon
-                ? "Difference: Finished ahead"
-                : "Difference: Opponent finished first";
+        if (game.playerFinishTime > 0 && game.aiFinishTime > 0) {
+            const gap = Math.abs(game.playerFinishTime - game.aiFinishTime);
+            difference.innerText =
+                game.playerFinishTime <= game.aiFinishTime
+                    ? "Difference: Won by " + gap.toFixed(2) + "s"
+                    : "Difference: Lost by " + gap.toFixed(2) + "s";
+        }
+        else if (game.playerFinishTime > 0 && game.aiFinishTime <= 0) {
+            difference.innerText =
+                "Difference: Opponent still racing...";
+        }
+        else if (game.aiFinishTime > 0 && game.playerFinishTime <= 0) {
+            difference.innerText =
+                "Difference: Opponent finished first";
+        }
+        else {
+            difference.innerText =
+                "Difference: Waiting...";
+        }
         reward.innerText =
-            reward.innerText =
-                "Race Reward: +$" + game.raceReward + "\n" +
-                    "Launch Bonus: +$" + game.bonusReward + "\n" +
-                    "Difficulty Multiplier: x" + game.difficultyMultiplier + "\n" +
-                    "Distance Multiplier: x" + game.distanceMultiplier + "\n" +
-                    "Total Cash Earned: +$" + game.totalReward;
+            "Race Reward: +$" + game.raceReward + "\n" +
+                "Launch Bonus: +$" + game.bonusReward + "\n" +
+                "Difficulty Multiplier: x" + game.difficultyMultiplier + "\n" +
+                "Distance Multiplier: x" + game.distanceMultiplier + "\n" +
+                "Total Cash Earned: +$" + game.totalReward;
     },
     drawExtras(car) { }
 };

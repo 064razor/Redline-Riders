@@ -139,7 +139,7 @@ function drawCarBody(
     const speedBlur =
         Math.min(Math.abs(car.spd) / 8, 1);
 
-    drawRim(
+    Bodywork.drawRim(
         ctx,
         rimStyle,
         sprite.rearWheel.x,
@@ -148,7 +148,7 @@ function drawCarBody(
         speedBlur
     );
 
-    drawRim(
+    Bodywork.drawRim(
         ctx,
         rimStyle,
         sprite.frontWheel.x,
@@ -160,140 +160,7 @@ function drawCarBody(
     ctx.restore();
 }
 
-function drawRim(
-    ctx: CanvasRenderingContext2D,
-    style: string,
-    x: number,
-    y: number,
-    rotation: number = 0,
-    blur: number = 0
-) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
 
-    ctx.fillStyle = "#222";
-    ctx.beginPath();
-    ctx.arc(0, 0, 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (blur > 0.25) {
-        ctx.strokeStyle =
-            `rgba(255, 255, 255, ${0.25 + blur * 0.35})`;
-
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(0, 0, 8, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.strokeStyle =
-            `rgba(255, 255, 255, ${0.15 + blur * 0.25})`;
-
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(0, 0, 5, 0, Math.PI * 2);
-        ctx.stroke();
-    }
-
-    ctx.strokeStyle = "#dcdcdc";
-    ctx.lineWidth = 2;
-
-    if (style === "classic5") {
-        for (let i = 0; i < 5; i++) {
-            const a = (Math.PI * 2 / 5) * i;
-
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(
-                Math.cos(a) * 7.5,
-                Math.sin(a) * 7.5
-            );
-            ctx.stroke();
-        }
-    }
-    else if (style === "split6") {
-        for (let i = 0; i < 6; i++) {
-            const a = (Math.PI * 2 / 6) * i;
-
-            ctx.beginPath();
-            ctx.moveTo(
-                Math.cos(a - 0.08) * 2,
-                Math.sin(a - 0.08) * 2
-            );
-            ctx.lineTo(
-                Math.cos(a - 0.08) * 7,
-                Math.sin(a - 0.08) * 7
-            );
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(
-                Math.cos(a + 0.08) * 2,
-                Math.sin(a + 0.08) * 2
-            );
-            ctx.lineTo(
-                Math.cos(a + 0.08) * 7,
-                Math.sin(a + 0.08) * 7
-            );
-            ctx.stroke();
-        }
-    }
-    else if (style === "mesh") {
-        ctx.strokeStyle = "#cfcfcf";
-
-        for (let i = -6; i <= 6; i += 3) {
-            ctx.beginPath();
-            ctx.moveTo(-7, i);
-            ctx.lineTo(7, -i);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(-7, -i);
-            ctx.lineTo(7, i);
-            ctx.stroke();
-        }
-    }
-    else if (style === "deepDish") {
-        ctx.strokeStyle = "#bfbfbf";
-        ctx.lineWidth = 2;
-
-        ctx.beginPath();
-        ctx.arc(0, 0, 8, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(0, 0, 4, 0, Math.PI * 2);
-        ctx.stroke();
-    }
-    else if (style === "star") {
-        for (let i = 0; i < 5; i++) {
-            const a =
-                (Math.PI * 2 / 5) * i -
-                Math.PI / 2;
-
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(
-                Math.cos(a) * 7.5,
-                Math.sin(a) * 7.5
-            );
-            ctx.stroke();
-        }
-
-        ctx.beginPath();
-        ctx.arc(0, 0, 2, 0, Math.PI * 2);
-        ctx.fillStyle = "#ddd";
-        ctx.fill();
-    }
-
-    ctx.beginPath();
-    ctx.arc(0, 0, 9, 0, Math.PI * 2);
-    ctx.strokeStyle = "#111";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    ctx.restore();
-}
 
 function drawProgressBars(
     ctx: CanvasRenderingContext2D,

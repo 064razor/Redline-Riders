@@ -45,6 +45,10 @@ export const Physics = {
         const gearRange = Math.max(effectiveGearMaxSpeed - gearStartSpeed, 0.001);
         const gearProgress = Math.min(Math.max((car.spd - gearStartSpeed) / gearRange, 0), 1);
         const targetRPM = 1000 + gearProgress * (car.maxRPM - 1000);
+        const gearOverrun = Math.max(0, car.spd - effectiveGearMaxSpeed);
+        const gearOverrunPenalty = gearOverrun > 0
+            ? Math.max(0.08, 1 - gearOverrun * 1.8)
+            : 1;
         car.rpm +=
             (targetRPM - car.rpm) * 0.12;
         if (car.rpm < 1000)
@@ -78,7 +82,8 @@ export const Physics = {
         let accel = ((powerToWeight * 0.52) + (torqueToWeight * 0.44)) * 15;
         accel *=
             torqueFactor *
-                accelRatio;
+                accelRatio *
+                gearOverrunPenalty;
         // ===== SHIFT INTERRUPTION =====
         if (car.shiftTimer > 0) {
             accel *= 0.25;

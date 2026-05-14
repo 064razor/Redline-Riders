@@ -1,6 +1,7 @@
 import { SaveSystem } from "./save.js";
 import { Dealer } from "./dealer.js";
 import { Game } from "./game.js";
+import { Bodywork } from "./bodywork.js";
 import { Menu } from "./menu.js";
 import { Input } from "./input.js";
 import { Garage } from "./garage.js";
@@ -55,6 +56,30 @@ function syncShopUI() {
     needleBtn.innerText = `Change ($${Customize.needlePrice})`;
     hubBtn.innerText = `Change ($${Customize.hubPrice})`;
     textBtn.innerText = `Change ($${Customize.textPrice})`;
+	
+	const rimSelect =
+		document.getElementById("rimStyleSelect") as HTMLSelectElement;
+
+	rimSelect.innerHTML = "";
+
+	const rims =
+		Bodywork.cars[Game.playerCar.bodyId].rims;
+
+	for (const rimId of Object.keys(rims)) {
+
+		const option =
+			document.createElement("option");
+
+		option.value = rimId;
+		option.textContent = rims[rimId];
+
+		if (Game.playerCar.rimStyle === rimId) {
+			option.selected = true;
+    }
+
+    rimSelect.appendChild(option);
+}
+
 }
 
 function syncDealerUI() {
@@ -142,8 +167,21 @@ loadSlotBtn.onclick = () => {
 
 
 document.getElementById("startBtn")!.onclick = () => {
+	
 
     AudioSystem.init();
+
+    Game.start();
+};
+
+(document.getElementById("raceAgainBtn") as HTMLButtonElement)
+.onclick = () => {
+    Game.raceStarted = false;
+    Game.countdownActive = false;
+    Game.raceFinished = true;
+    Game.raceSummaryVisible = false;
+
+    AudioSystem.stopEngine();
 
     Game.start();
 };

@@ -24,7 +24,9 @@ export const Menu = {
     },
     isRaceBusy() {
         const game = window.Game;
-        return game && (game.countdownActive || game.raceStarted);
+        return (game &&
+            (game.countdownActive || game.raceStarted) &&
+            !game.raceSummaryVisible);
     },
     bindButton(buttonId, panelId, afterOpen) {
         const button = document.getElementById(buttonId);
@@ -50,16 +52,13 @@ export const Menu = {
         }
     },
     showPanel(panelId) {
-        this.hideAll();
-        const summary = document.getElementById("raceSummary");
-        if (summary) {
-            summary.classList.add("hidden");
-            summary.style.display = "none";
-        }
         const game = window.Game;
-        if (game) {
-            game.raceSummaryVisible = false;
+        if (game &&
+            (game.raceStarted || game.countdownActive) &&
+            !game.raceSummaryVisible) {
+            return;
         }
+        this.hideAll();
         const panel = document.getElementById(panelId);
         if (panel) {
             panel.classList.remove("hidden");

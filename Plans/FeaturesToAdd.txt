@@ -16,15 +16,10 @@ Gameplay loop:
 All clear!
 
 Fix:
-+Restore results screen UI
+All clear!
 
 Overhaul(Major update/features for the future)
 +Proper fwd/rwd behavior
-+Basic sound
 +Proper car paint masking
 +Generic decals
 
-Player feedback:
-Engine Sounds to make it more immersive
-Difficulty actually scaling with cars
-Possibly get more money depending the difficulty? - Done

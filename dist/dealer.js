@@ -12,7 +12,7 @@ export const Dealer = {
         },
         {
             bodyId: "swagGG2",
-            price: 1450,
+            price: 1400,
             displayName: Bodywork.cars.swagGG2.displayName,
             description: "Lightweight, zippy hatchback with quick response."
         },
@@ -21,7 +21,20 @@ export const Dealer = {
             price: 2100,
             displayName: Bodywork.cars.rouletteBlair.displayName,
             description: "Heavy, but powerful. Built for the drag strip."
-        }
+        },
+        {
+            id: "rouletteMontBlanc",
+            name: "Roulette Mont Blanc",
+            price: 2450,
+            displayName: Bodywork.cars.rouletteMontBlanc.displayName,
+            description: "Muscular in-betweener. Stern, but fair"
+        },
+        {
+            bodyId: "hannaCivilian",
+            price: 1850,
+            displayName: Bodywork.cars.hannaCivilian.displayName,
+            description: "Underpowerd but high-revving coupe. Ready and reliable."
+        },
     ],
     selectedBodyId: "maruMk5",
     ownsCar(bodyId) {
@@ -36,6 +49,12 @@ export const Dealer = {
         }
         if (bodyId === "rouletteBlair") {
             return Garage.getRouletteBlair();
+        }
+        if (bodyId === "rouletteMontBlanc") {
+            return Garage.getRouletteMontBlanc();
+        }
+        if (bodyId === "hannaCivilian") {
+            return Garage.getHannaCivilian();
         }
         return null;
     },

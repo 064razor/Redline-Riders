@@ -28,9 +28,14 @@ export const Menu = {
     },
 
     isRaceBusy() {
-        const game = (window as any).Game;
-        return game && (game.countdownActive || game.raceStarted);
-    },
+		const game = (window as any).Game;
+
+		return (
+			game &&
+			(game.countdownActive || game.raceStarted) &&
+			!game.raceSummaryVisible
+		);
+	},
 
     bindButton(buttonId: string, panelId: string, afterOpen?: () => void) {
         const button = document.getElementById(buttonId) as HTMLButtonElement;
@@ -60,20 +65,20 @@ export const Menu = {
     },
 
     showPanel(panelId: string) {
-        this.hideAll();
-
-        const summary = document.getElementById("raceSummary");
-        if (summary) {
-        summary.classList.add("hidden");
-        summary.style.display = "none";
-    }
-
     const game = (window as any).Game;
-    if (game) {
-        game.raceSummaryVisible = false;
+
+    if (
+        game &&
+        (game.raceStarted || game.countdownActive) &&
+        !game.raceSummaryVisible
+    ) {
+        return;
     }
+
+    this.hideAll();
 
     const panel = document.getElementById(panelId);
+
     if (panel) {
         panel.classList.remove("hidden");
     }

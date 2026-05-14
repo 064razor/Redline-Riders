@@ -13,7 +13,10 @@ export const Game = {
 
     garageCars: {
         maruMk5: Garage.getMaruMk5(),
-        swagGG2: Garage.getSwagGG2()
+        swagGG2: Garage.getSwagGG2(),
+        rouletteBlair: Garage.getRouletteBlair(),
+        rouletteMontBlanc: Garage.getRouletteMontBlanc(),
+		hannaCivilian: Garage.getHannaCivilian()
     } as any,
 
     playerCar: null as any,
@@ -35,14 +38,14 @@ export const Game = {
     raceMessage: "",
     raceMessageTimer: 0,
     raceTime: 0,
- 
+
     raceReward: 0,
     bonusReward: 0,
     difficultyMultiplier: 1,
     distanceMultiplier: 1,
     playerFinishTime: 0,
     aiFinishTime: 0,
-	totalReward: 0,
+    totalReward: 0,
     raceSummaryVisible: false,
 
     aiLaunchRPM: 0,
@@ -60,17 +63,18 @@ export const Game = {
 
         const save = SaveSystem.loadCurrentSlot();
 
+        const defaultGarageCars = {
+            maruMk5: Garage.getMaruMk5(),
+            swagGG2: Garage.getSwagGG2(),
+            rouletteBlair: Garage.getRouletteBlair(),
+            rouletteMontBlanc: Garage.getRouletteMontBlanc()
+        };
+
         if (save) {
             this.money = save.money ?? 0;
             this.ownedCars = save.ownedCars ?? ["maruMk5"];
 
-            const defaultGarageCars = {
-                maruMk5: Garage.getMaruMk5(),
-                swagGG2: Garage.getSwagGG2(),
-				rouletteBlair: Garage.getRouletteBlair()
-            };
-			
-			this.garageCars = {
+            this.garageCars = {
                 ...defaultGarageCars,
                 ...(save.garageCars ?? {})
             };
@@ -80,13 +84,7 @@ export const Game = {
                 this.garageCars.maruMk5;
         }
         else {
-            this.garageCars = {
-                maruMk5: Garage.getMaruMk5(),
-                swagGG2: Garage.getSwagGG2(),
-				rouletteBlair: Garage.getRouletteBlair()
-
-            };
-
+            this.garageCars = defaultGarageCars;
             this.playerCar = this.garageCars.maruMk5;
         }
     },
@@ -111,8 +109,8 @@ export const Game = {
             document.getElementById("trackSelect") as HTMLSelectElement;
 
         this.trackLength = Number(trackSelect.value);
-		
-		if (this.trackLength <= 40) {
+
+        if (this.trackLength <= 40) {
             this.distanceMultiplier = 1;
         }
         else if (this.trackLength <= 80) {
@@ -122,7 +120,7 @@ export const Game = {
             this.distanceMultiplier = 1.6;
         }
         else {
-             this.distanceMultiplier = 2;
+            this.distanceMultiplier = 2;
         }
 
         this.raceMessage = "";
@@ -131,15 +129,17 @@ export const Game = {
         const aiChoices = [
             Garage.getMaruMk5,
             Garage.getSwagGG2,
-			Garage.getRouletteBlair
+            Garage.getRouletteBlair,
+            Garage.getRouletteMontBlanc,
+			Garage.getHannaCivilian
         ];
 
         const aiFactory =
             aiChoices[Math.floor(Math.random() * aiChoices.length)];
 
         this.aiCar = aiFactory.call(Garage);
-		
-		const aiRimStyles = [
+
+        const aiRimStyles = [
             "classic5",
             "split6",
             "mesh",
@@ -147,8 +147,8 @@ export const Game = {
             "star"
         ];
 
-this.aiCar.rimStyle =
-    aiRimStyles[Math.floor(Math.random() * aiRimStyles.length)];
+        this.aiCar.rimStyle =
+            aiRimStyles[Math.floor(Math.random() * aiRimStyles.length)];
 
         const aiColors = [
             "#ffffff", "#ff3333", "#33aaff", "#33ff66",
@@ -170,6 +170,13 @@ this.aiCar.rimStyle =
         this.playerCar.shiftTimer = 0;
         this.playerCar.shiftRPMDrop = false;
 
+        this.aiCar.spd = 0;
+        this.aiCar.pos = 0;
+        this.aiCar.rpm = 1000;
+        this.aiCar.gear = 1;
+        this.aiCar.shiftTimer = 0;
+        this.aiCar.shiftRPMDrop = false;
+
         this.raceStarted = false;
         this.countdownActive = true;
         this.countdownValue = 3;
@@ -184,8 +191,8 @@ this.aiCar.rimStyle =
             document.getElementById("difficultySelect") as HTMLSelectElement;
 
         const difficulty = difficultySelect.value;
-		
-		this.difficultyMultiplier = 1;
+
+        this.difficultyMultiplier = 1;
 
         if (difficulty === "normal") {
             this.difficultyMultiplier = 1.25;
@@ -214,12 +221,7 @@ this.aiCar.rimStyle =
             this.aiShiftDelay = 0.53;
         }
 
-        this.aiCar.spd = 0;
-        this.aiCar.pos = 0;
         this.aiCar.rpm = this.aiLaunchRPM;
-        this.aiCar.gear = 1;
-        this.aiCar.shiftTimer = 0;
-        this.aiCar.shiftRPMDrop = false;
 
         UI.showCountdown(this.countdownValue);
 
@@ -280,7 +282,7 @@ this.aiCar.rimStyle =
     },
 
     updateAI(dt: number) {
-        if (!this.aiCar || !this.raceStarted) return;
+        if (!this.aiCar || !this.raceStarted || this.aiFinished) return;
 
         const car = this.aiCar;
 
@@ -296,6 +298,28 @@ this.aiCar.rimStyle =
         }
     },
 
+    awardRace(playerWon: boolean) {
+        this.raceReward = playerWon ? 100 : 25;
+
+        this.totalReward = Math.floor(
+            (this.raceReward + this.bonusReward)
+            * this.difficultyMultiplier
+            * this.distanceMultiplier
+        );
+
+        this.money += this.totalReward;
+
+        this.raceMessage =
+            playerWon
+                ? "You won! +$" + this.totalReward
+                : "You lost! +$" + this.totalReward;
+
+        this.raceMessageTimer = 3;
+        this.raceSummaryVisible = true;
+
+        SaveSystem.save(this);
+    },
+
     loop() {
         if (this.loopRunning) return;
         this.loopRunning = true;
@@ -304,24 +328,32 @@ this.aiCar.rimStyle =
             if (this.countdownActive) {
                 Physics.update(this.playerCar, 0.016);
             }
-			
-			if (this.countdownActive || this.raceStarted) {
+
+            if (
+				(this.countdownActive || this.raceStarted) &&
+				!this.playerFinished
+			) {
 				AudioSystem.updateEngine(
 					this.playerCar,
 					Input.holdingThrottle
 				);
-		}
-		else {
-			AudioSystem.stopEngine();
-		}
+			}
+			else {
+				AudioSystem.stopEngine();
+			}
 
             if (this.raceStarted) {
                 this.raceTime += 0.016;
 
                 this.updateAI(0.016);
 
-                Physics.update(this.playerCar, 0.016);
-                Physics.update(this.aiCar, 0.016);
+                if (!this.playerFinished) {
+                    Physics.update(this.playerCar, 0.016);
+                }
+
+                if (!this.aiFinished) {
+                    Physics.update(this.aiCar, 0.016);
+                }
 
                 if (
                     !this.playerFinished &&
@@ -329,6 +361,11 @@ this.aiCar.rimStyle =
                 ) {
                     this.playerFinished = true;
                     this.playerFinishTime = this.raceTime;
+                    this.playerCar.spd = 0;
+
+                    if (!this.aiFinished && !this.raceSummaryVisible) {
+                        this.awardRace(true);
+                    }
                 }
 
                 if (
@@ -337,6 +374,18 @@ this.aiCar.rimStyle =
                 ) {
                     this.aiFinished = true;
                     this.aiFinishTime = this.raceTime;
+                    this.aiCar.spd = 0;
+                }
+
+                if (
+                    this.playerFinished &&
+                    this.aiFinished &&
+                    !this.raceSummaryVisible
+                ) {
+                    const playerWon =
+                        this.playerFinishTime <= this.aiFinishTime;
+
+                    this.awardRace(playerWon);
                 }
 
                 if (
@@ -346,35 +395,11 @@ this.aiCar.rimStyle =
                 ) {
                     this.raceFinished = true;
                     this.raceStarted = false;
-					
-					AudioSystem.stopEngine();
 
-                    const playerWon =
-                        this.playerFinishTime <= this.aiFinishTime;
+                    this.playerCar.spd = 0;
+                    this.aiCar.spd = 0;
 
-                    if (playerWon) {
-                        this.raceReward = 100;
-                    }
-                    else {
-                         this.raceReward = 25;
-                    }
-
-                    this.totalReward = Math.floor(
-                        (this.raceReward + this.bonusReward)
-                        * this.difficultyMultiplier
-                        * this.distanceMultiplier
-                    );
-
-                    this.money += this.totalReward;
-
-                    this.raceMessage = playerWon
-                        ? "You won! +$" + this.totalReward
-                        : "You lost! +$" + this.totalReward;
-
-                    SaveSystem.save(this);
-
-                    this.raceMessageTimer = 3;
-                    this.raceSummaryVisible = true;
+                    AudioSystem.stopEngine();
                 }
             }
 

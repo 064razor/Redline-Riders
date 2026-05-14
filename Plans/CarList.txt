@@ -1,9 +1,9 @@
 Car list
-1st car: (Starter) Mazda MX-5 shaped = Maru MK-5 2012 in-game name
-2nd car: Volkswagen Golf GTI MK2 shaped,  Swag GG V2 1992 in-game name
-3rd car: Honda Civic 1999 shaped = Hanna Civilian 1999 in-game name
+1st car: (Starter) Mazda MX-5 shaped = Maru MK-5 2012 in-game name(Done)
+2nd car: Volkswagen Golf GTI MK2 shaped,  Swag GG V2 1992 in-game name(Done)
+3rd car: Honda Civic coupe 1999 shaped = Hanna Civilian 1999 in-game name(Done)
 4th car: Volkswagen New Beetle 2024 shaped = Swag Ladybug 2024 in-game name
-5th car: Chevy Bel Air 1950 shaped = Roulette Blair 1950 in-game name
+5th car: Chevy Bel Air 1950 shaped = Roulette Blair 1950 in-game name(Done)
 6th car: Subaru BRZ 2012 shaped = Subarashi Zen 2012 in-game name
 7th car: Toyota MR2 2002 shaped = Toiler Mister2 2002 in-game name
 8th car: Ford Focus 2007 shaped = Fjord Foresight 2007 in-game name
