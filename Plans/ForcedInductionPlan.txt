@@ -1,0 +1,18 @@
+Forced induction status:
++Implemented as live engine behavior, not only flat stat upgrades.
+
+Current behavior:
++Turbo: Builds PSI later in the RPM range, with spool momentum and stronger high-RPM torque once lit.
++Supercharger: Instant mechanically linked boost, lower peak PSI, strong low/mid torque, softer top-end payoff than turbo.
++Displacement: NA+ path. Adds natural torque/power without PSI behavior.
++Boost gauge: Shows live PSI or BAR with notches.
++Shift windows: Adapt to torque curves, estimated boost behavior, RPM, and gear ratio drops.
+
+Follow-up tuning:
++Add boost profile differences by car or future turbo/supercharger stages
++Tune turbo lag and boost ceiling after more race testing
++Consider turbo stage variants: small quick-spool turbo vs large top-end turbo
++Tune Super so it feels responsive without becoming the obvious best upgrade
++Consider future supercharger styles: roots/twin-screw low-end vs centrifugal high-RPM
++Continue tuning NA+ torque curve broadening after more race testing
++Consider turbo/supercharger visual or audio cues once balance stabilizes

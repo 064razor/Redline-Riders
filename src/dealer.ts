@@ -25,7 +25,7 @@ export const Dealer = {
             description: "Heavy, but powerful. Built for the drag strip."
         },	
 		{
-			id: "rouletteMontBlanc",
+			bodyId: "rouletteMontBlanc",
 			name: "Roulette Mont Blanc",
 			price: 2450,
 			displayName: Bodywork.cars.rouletteMontBlanc.displayName,

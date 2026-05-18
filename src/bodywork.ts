@@ -10,21 +10,22 @@ export const Bodywork = {
 
             sprite: {
                 imagePath: "./assets/cars/maru-mk5/body-white.png",
-                xOffset: -12,
+                paintMaskPath: "./assets/cars/maru-mk5/paint-mask.png",
+                xOffset: -62,
                 yOffset: -14,
                 width: 96,
                 height: 75,
 
                 rearWheel: {
-                    x: 11,
+                    x: -39,
                     y: 33,
-                    radius: 7
+                    radius: 6.8
                 },
 
                 frontWheel: {
-                    x: 68,
+                    x: 18,
                     y: 33,
-                    radius: 7
+                    radius: 6.8
                 }
             },
 
@@ -44,7 +45,11 @@ export const Bodywork = {
                 trackTwin: "Track Twin-Spoke",
                 retroSlot: "Retro Slot Mag",
                 muscleChrome: "Muscle Chrome",
-                heritageWire: "Heritage Wire"
+                heritageWire: "Heritage Wire",
+                triBlade: "Tri-Blade",
+                rallyDisc: "Rally Disc",
+                splitTen: "Split Ten",
+                aeroRing: "Aero Ring"
             }
         },
 
@@ -58,21 +63,22 @@ export const Bodywork = {
 
             sprite: {
                 imagePath: "./assets/cars/swag-gg-2/body-white.png",
-                xOffset: -9,
+                paintMaskPath: "./assets/cars/swag-gg-2/paint-mask.png",
+                xOffset: -59,
                 yOffset: -10,
                 width: 104,
                 height: 50,
 
                 rearWheel: {
-                    x: 16,
+                    x: -33.8,
                     y: 30,
-                    radius: 3
+                    radius: 5.6
                 },
 
                 frontWheel: {
-                    x: 72,
+                    x: 22.3,
                     y: 30,
-                    radius: 3
+                    radius: 5.6
                 }
             },
 
@@ -92,7 +98,11 @@ export const Bodywork = {
                 trackTwin: "Track Twin-Spoke",
                 retroSlot: "Retro Slot Mag",
                 muscleChrome: "Muscle Chrome",
-                heritageWire: "Heritage Wire"
+                heritageWire: "Heritage Wire",
+                triBlade: "Tri-Blade",
+                rallyDisc: "Rally Disc",
+                splitTen: "Split Ten",
+                aeroRing: "Aero Ring"
             }
         },
 
@@ -106,21 +116,22 @@ export const Bodywork = {
 
             sprite: {
                 imagePath: "./assets/cars/roulette-blair/body-white.png",
-                xOffset: -23,
+                paintMaskPath: "./assets/cars/roulette-blair/paint-mask.png",
+                xOffset: -73,
                 yOffset: -19,
                 width: 115,
                 height: 80,
 
                 rearWheel: {
-                    x: 7,
+                    x: -43,
                     y: 32,
-                    radius: 8
+                    radius: 7.1
                 },
 
                 frontWheel: {
-                    x: 70,
+                    x: 20,
                     y: 32,
-                    radius: 8
+                    radius: 7.1
                 }
             },
 
@@ -140,7 +151,11 @@ export const Bodywork = {
                 trackTwin: "Track Twin-Spoke",
                 retroSlot: "Retro Slot Mag",
                 muscleChrome: "Muscle Chrome",
-                heritageWire: "Heritage Wire"
+                heritageWire: "Heritage Wire",
+                triBlade: "Tri-Blade",
+                rallyDisc: "Rally Disc",
+                splitTen: "Split Ten",
+                aeroRing: "Aero Ring"
             }
         },
 
@@ -154,21 +169,22 @@ export const Bodywork = {
 
             sprite: {
                 imagePath: "./assets/cars/roulette-mont-blanc/body-white.png",
-                xOffset: -17,
+                paintMaskPath: "./assets/cars/roulette-mont-blanc/paint-mask.png",
+                xOffset: -67,
                 yOffset: -22,
                 width: 110,
                 height: 82,
 
                 rearWheel: {
-                    x: 11,
+                    x: -39,
                     y: 30,
-                    radius: 8
+                    radius: 6.9
                 },
 
                 frontWheel: {
-                    x: 70,
+                    x: 20,
                     y: 30,
-                    radius: 8
+                    radius: 6.9
                 }
             },
 
@@ -188,7 +204,11 @@ export const Bodywork = {
                 trackTwin: "Track Twin-Spoke",
                 retroSlot: "Retro Slot Mag",
                 muscleChrome: "Muscle Chrome",
-                heritageWire: "Heritage Wire"
+                heritageWire: "Heritage Wire",
+                triBlade: "Tri-Blade",
+                rallyDisc: "Rally Disc",
+                splitTen: "Split Ten",
+                aeroRing: "Aero Ring"
             }
         },
 	 
@@ -202,21 +222,22 @@ export const Bodywork = {
 
 			sprite: {
 				imagePath: "./assets/cars/hanna-civilian/body-white.png",
-				xOffset: -22,
+				paintMaskPath: "./assets/cars/hanna-civilian/paint-mask.png",
+				xOffset: -72,
 				yOffset: -16,
 				width: 109,
 				height: 71,
 
 				rearWheel: {
-					x: 1,
+					x: -49,
 					y: 31,
-					radius: 4
+					radius: 6.7
 				},
 
 				frontWheel: {
-					x: 63,
+					x: 13,
 					y: 31,
-					radius: 4
+					radius: 6.7
 				}
 			},
 
@@ -236,7 +257,11 @@ export const Bodywork = {
 				trackTwin: "Track Twin-Spoke",
 				retroSlot: "Retro Slot Mag",
 				muscleChrome: "Muscle Chrome",
-				heritageWire: "Heritage Wire"
+				heritageWire: "Heritage Wire",
+				triBlade: "Tri-Blade",
+				rallyDisc: "Rally Disc",
+				splitTen: "Split Ten",
+				aeroRing: "Aero Ring"
 			}
         },
 
@@ -247,10 +272,11 @@ export const Bodywork = {
         x: number,
         y: number,
         rotation: number = 0,
-        blur: number = 0
+        blur: number = 0,
+        scale: number = 1
     ) {
-        const radius = 8;
-        const innerRadius = 3;
+        const radius = 8 * scale;
+        const innerRadius = 3 * scale;
         const blurAlpha = Math.max(0.25, 1 - blur * 0.08);
 
         const tireColor = "#050505";
@@ -282,20 +308,20 @@ export const Bodywork = {
 
         // ===== OUTER ALLOY LIP =====
         ctx.strokeStyle = rimColor;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2 * scale;
         ctx.beginPath();
         ctx.arc(0, 0, radius, 0, Math.PI * 2);
         ctx.stroke();
 
         ctx.strokeStyle = rimShadow;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1 * scale;
         ctx.beginPath();
         ctx.arc(0, 0, radius - 2, 0, Math.PI * 2);
         ctx.stroke();
 
         ctx.strokeStyle = rimColor;
         ctx.fillStyle = rimColor;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2 * scale;
 
         switch (style) {
             case "split6":
@@ -316,7 +342,7 @@ export const Bodywork = {
                 break;
 
             case "mesh":
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1 * scale;
 
                 for (let i = 0; i < 8; i++) {
                     const angle = (Math.PI * 2 / 8) * i;
@@ -335,7 +361,7 @@ export const Bodywork = {
 
             case "deepDish":
                 ctx.strokeStyle = rimColor;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
                 ctx.beginPath();
                 ctx.arc(0, 0, radius - 2, 0, Math.PI * 2);
                 ctx.stroke();
@@ -372,7 +398,7 @@ export const Bodywork = {
                 break;
 
             case "multiSpoke":
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1 * scale;
 
                 for (let i = 0; i < 12; i++) {
                     const angle = (Math.PI * 2 / 12) * i;
@@ -385,7 +411,7 @@ export const Bodywork = {
                 break;
 
             case "turbine":
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
 
                 for (let i = 0; i < 8; i++) {
                     const angle = (Math.PI * 2 / 8) * i;
@@ -403,7 +429,7 @@ export const Bodywork = {
                 break;
 
             case "fiveStar":
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 3 * scale;
 
                 for (let i = 0; i < 5; i++) {
                     const angle = (Math.PI * 2 / 5) * i;
@@ -418,7 +444,7 @@ export const Bodywork = {
             case "dragDish":
                 ctx.strokeStyle = rimColor;
                 ctx.fillStyle = barrelColor;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
 
                 ctx.beginPath();
                 ctx.arc(0, 0, radius - 1, 0, Math.PI * 2);
@@ -442,7 +468,7 @@ export const Bodywork = {
                 break;
 
             case "splitMesh":
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1 * scale;
 
                 for (let i = 0; i < 10; i++) {
                     const angle = (Math.PI * 2 / 10) * i;
@@ -461,7 +487,7 @@ export const Bodywork = {
                 break;
 
             case "hyper5":
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
 
                 for (let i = 0; i < 5; i++) {
                     const angle = (Math.PI * 2 / 5) * i;
@@ -475,7 +501,7 @@ export const Bodywork = {
                 break;
 
             case "gtMesh":
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1 * scale;
 
                 for (let i = 0; i < 12; i++) {
                     const angle = (Math.PI * 2 / 12) * i;
@@ -497,7 +523,7 @@ export const Bodywork = {
                 break;
 
             case "trackTwin":
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
 
                 for (let i = 0; i < 5; i++) {
                     const angle = (Math.PI * 2 / 5) * i;
@@ -516,7 +542,7 @@ export const Bodywork = {
                 break;
 
             case "retroSlot":
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
 
                 ctx.beginPath();
                 ctx.arc(0, 0, radius - 2, 0, Math.PI * 2);
@@ -536,12 +562,12 @@ export const Bodywork = {
                 break;
 
             case "muscleChrome":
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2 * scale;
                 ctx.beginPath();
                 ctx.arc(0, 0, radius - 2, 0, Math.PI * 2);
                 ctx.stroke();
 
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 3 * scale;
                 for (let i = 0; i < 5; i++) {
                     const angle = (Math.PI * 2 / 5) * i;
 
@@ -553,7 +579,7 @@ export const Bodywork = {
                 break;
 
             case "heritageWire":
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1 * scale;
 
                 for (let i = 0; i < 16; i++) {
                     const angle = (Math.PI * 2 / 16) * i;
@@ -567,6 +593,92 @@ export const Bodywork = {
                     ctx.moveTo(Math.cos(angle) * 2, Math.sin(angle) * 2);
                     ctx.lineTo(Math.cos(angle - 0.42) * (radius - 2), Math.sin(angle - 0.42) * (radius - 2));
                     ctx.stroke();
+                }
+                break;
+
+            case "triBlade":
+                ctx.fillStyle = rimColor;
+
+                for (let i = 0; i < 3; i++) {
+                    const angle = (Math.PI * 2 / 3) * i;
+
+                    ctx.save();
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(0, -innerRadius);
+                    ctx.quadraticCurveTo(4.8, -4.2, 3.2, -(radius - 1));
+                    ctx.lineTo(-1.4, -(radius - 3));
+                    ctx.quadraticCurveTo(-0.8, -4.2, 0, -innerRadius);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                break;
+
+            case "rallyDisc":
+                ctx.fillStyle = rimColor;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 1, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = barrelColor;
+
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 / 8) * i;
+
+                    ctx.beginPath();
+                    ctx.arc(
+                        Math.cos(angle) * 4.8,
+                        Math.sin(angle) * 4.8,
+                        1,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+                break;
+
+            case "splitTen":
+                ctx.lineWidth = 1.4 * scale;
+
+                for (let i = 0; i < 10; i++) {
+                    const angle = (Math.PI * 2 / 10) * i;
+                    const isLongSpoke = i % 2 === 0;
+                    const endRadius = isLongSpoke ? radius - 1 : radius - 3;
+
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius);
+                    ctx.lineTo(Math.cos(angle) * endRadius, Math.sin(angle) * endRadius);
+                    ctx.stroke();
+                }
+                break;
+
+            case "aeroRing":
+                ctx.fillStyle = rimColor;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 1, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = barrelColor;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = rimColor;
+                ctx.lineWidth = 2 * scale;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 3, 0, Math.PI * 2);
+                ctx.stroke();
+
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI * 2 / 4) * i + 0.3;
+
+                    ctx.save();
+                    ctx.rotate(angle);
+                    ctx.fillStyle = rimColor;
+                    ctx.beginPath();
+                    ctx.ellipse(0, -4.9, 1.4, 3.2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
                 }
                 break;
 
@@ -586,13 +698,13 @@ export const Bodywork = {
         // Hub cap
         ctx.fillStyle = hubColor;
         ctx.beginPath();
-        ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
+        ctx.arc(0, 0, 2.2 * scale, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.strokeStyle = tireColor;
-        ctx.lineWidth = 0.8;
+        ctx.lineWidth = 0.8 * scale;
         ctx.beginPath();
-        ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
+        ctx.arc(0, 0, 2.2 * scale, 0, Math.PI * 2);
         ctx.stroke();
 
         ctx.restore();
