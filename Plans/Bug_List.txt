@@ -1,13 +1,27 @@
 Visual:
-Shift messages missing
-Upgrades do not display how much they improve stats
-Upgrades aren't in-game messages and are still uses browser notifications
++Dealership still needs car icons/previews in the listing area
++Race summary is functional but visually plain
++Some menu text/layout polish remains before itch.io packaging
 
 Gameplay:
-Shift light and shift timing desynchronized
++Need broader race testing across all distances and difficulties
 
 Balance:
-Lower gears do not limit achievable speed, unrealistic gear ratios, shifting is weaker than never shifting
-Upgrades do not seem to affect performance
-Wheelspin too intense and carries out through whole race
++Per-car drag coefficient is not implemented yet
++Boosted upgrade balance needs a dedicated pass now that boost is dynamic
++Opponent class pools are needed so early races do not randomly feel unfair
++Dealer prices need a pass after stock class balance settles
 
+Resolved:
++Shift messages missing
++Upgrades do not display how much they improve stats
++Upgrade messages now appear in-game
++Shift light and shift timing desynchronized
++Lower gears do not limit achievable speed
++Unrealistic gear/shift incentives made shifting weaker than never shifting
++Upgrades did not clearly affect performance
++Wheelspin too intense and carried through whole race
++Boost gauge was abstract/floating
++Forced induction lacked live PSI behavior
++Torque behavior was shared and generic instead of per-car
++No test drive/practice flow for learning shift timing safely

@@ -1,4 +1,6 @@
 import { Options } from "./options.js";
+import { speedToMph } from "./speed.js";
+import { getShiftQuality, getShiftWindow } from "./power.js";
 export const UI = {
     shiftState: "off",
     shiftMessage: "",
@@ -12,9 +14,38 @@ export const UI = {
     },
     init() { },
     update(player, game) {
+        const gameCanvas = document.getElementById("gameCanvas");
+        const tachCanvas = document.getElementById("tachCanvas");
+        const shouldShowRaceUI = game.countdownActive ||
+            game.raceStarted ||
+            game.raceSummaryVisible;
+        if (gameCanvas) {
+            gameCanvas.style.display =
+                shouldShowRaceUI ? "block" : "none";
+        }
+        if (tachCanvas) {
+            tachCanvas.style.display =
+                shouldShowRaceUI ? "block" : "none";
+        }
+        const garageCanvas = document.getElementById("garageCanvas");
+        if (garageCanvas) {
+            const garagePanel = document.getElementById("garagePanel");
+            const upgradePanel = document.getElementById("upgradePanel");
+            const customizePanel = document.getElementById("customizePanel");
+            const previewPanelOpen = (garagePanel && !garagePanel.classList.contains("hidden")) ||
+                (upgradePanel && !upgradePanel.classList.contains("hidden")) ||
+                (customizePanel && !customizePanel.classList.contains("hidden"));
+            garageCanvas.style.display =
+                previewPanelOpen &&
+                    !game.countdownActive &&
+                    !game.raceStarted &&
+                    !game.raceSummaryVisible
+                    ? "block"
+                    : "none";
+        }
         document.getElementById("raceMessage").innerText =
             game.raceMessage;
-        let speedValue = player.spd * 20;
+        let speedValue = speedToMph(player.spd);
         let speedLabel = "MPH";
         // ===== KM/H CONVERSION =====
         if (Options.speedUnit === "KMH") {
@@ -25,7 +56,7 @@ export const UI = {
             "$" + game.money;
         // ===== SHOP BUTTON PRICE UPDATES =====
         document.getElementById("buyTires").innerText =
-            "Buy Tires (+1 Grip) ($" + game.playerCar.tirePrice + ")";
+            "Buy Tires (+120 Grip) ($" + game.playerCar.tirePrice + ")";
         document.getElementById("buyEngine").innerText =
             "Buy Engine (+25 HP) ($" + game.playerCar.enginePrice + ")";
         document.getElementById("buyTransmission").innerText =
@@ -49,15 +80,20 @@ export const UI = {
         const shiftMsg = document.getElementById("shiftMsg");
         if (shiftMsg) {
             shiftMsg.innerText = state;
+            shiftMsg.classList.remove("perfect", "good", "bad", "active");
+            shiftMsg.classList.add("active");
             // Optional colors for readability
             if (state === "PERFECT") {
                 shiftMsg.style.color = "#33ff33";
+                shiftMsg.classList.add("perfect");
             }
             else if (state === "GOOD") {
                 shiftMsg.style.color = "#ffff33";
+                shiftMsg.classList.add("good");
             }
             else {
                 shiftMsg.style.color = "#ff3333";
+                shiftMsg.classList.add("bad");
             }
         }
     },
@@ -110,26 +146,27 @@ export const UI = {
             ctx.fillText(game.launchState, centerX, centerY - 25);
         }
         // ===== DRAW POWERBAND ZONES =====
-        const powerbandStartRatio = car.powerbandMin / car.maxRPM;
-        const perfectStartRatio = (car.powerbandMax * 0.92) / car.maxRPM;
-        const powerbandEndRatio = car.powerbandMax / car.maxRPM;
+        const shiftWindow = getShiftWindow(car);
+        const powerbandStartRatio = shiftWindow.goodStart / car.maxRPM;
+        const perfectStartRatio = shiftWindow.perfectStart / car.maxRPM;
+        const powerbandEndRatio = shiftWindow.perfectEnd / car.maxRPM;
         const powerbandStartAngle = startAngle + powerbandStartRatio * Math.PI;
         const perfectStartAngle = startAngle + perfectStartRatio * Math.PI;
         const powerbandEndAngle = startAngle + powerbandEndRatio * Math.PI;
         // GOOD ZONE
-        ctx.strokeStyle = "#ffff33";
+        ctx.strokeStyle = "#f1db10";
         ctx.lineWidth = 7;
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius + 8, powerbandStartAngle, perfectStartAngle);
         ctx.stroke();
         // PERFECT ZONE
-        ctx.strokeStyle = "#33ff33";
+        ctx.strokeStyle = "#44f318";
         ctx.lineWidth = 7;
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius + 8, perfectStartAngle, powerbandEndAngle);
         ctx.stroke();
         // REDLINE ZONE
-        ctx.strokeStyle = "#ff3333";
+        ctx.strokeStyle = "#c50808";
         ctx.lineWidth = 7;
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius + 8, powerbandEndAngle, endAngle);
@@ -144,7 +181,7 @@ export const UI = {
             const ratio = rpm / car.maxRPM;
             const angle = startAngle + ratio * Math.PI;
             const isMajorTick = rpm % 1000 === 0;
-            ctx.strokeStyle = rpm >= car.powerbandMax ? "#ff3333" : "#aaa";
+            ctx.strokeStyle = rpm >= shiftWindow.perfectEnd ? "#ff3333" : "#aaa";
             ctx.lineWidth = isMajorTick ? 2 : 1;
             const tickStart = isMajorTick ? radius - 11 : radius - 6;
             const tickEnd = radius + 3;
@@ -158,7 +195,7 @@ export const UI = {
             const ratio = rpm / car.maxRPM;
             const angle = startAngle + ratio * Math.PI;
             const number = rpm / 1000;
-            ctx.fillStyle = rpm >= car.powerbandMax
+            ctx.fillStyle = rpm >= shiftWindow.perfectEnd
                 ? "#ff6666"
                 : (car.tachTextColor || "#ffffff");
             ctx.fillText(number.toString(), centerX + Math.cos(angle) * (radius + 19), centerY + Math.sin(angle) * (radius + 19));
@@ -178,6 +215,7 @@ export const UI = {
                 const shiftMsg = document.getElementById("shiftMsg");
                 if (shiftMsg) {
                     shiftMsg.innerText = "";
+                    shiftMsg.classList.remove("perfect", "good", "bad", "active");
                 }
             }
         }
@@ -199,21 +237,22 @@ export const UI = {
         }
         else {
             // Show current shift quality indicator
-            if (car.rpm < car.powerbandMin) {
+            const liveShiftQuality = getShiftQuality(car, car.rpm);
+            if (liveShiftQuality === "EARLY") {
                 // EARLY
                 shiftLightColor = "#111";
             }
-            else if (car.rpm < car.powerbandMax * 0.92) {
+            else if (liveShiftQuality === "GOOD") {
                 // GOOD
-                shiftLightColor = "#ffff33";
+                shiftLightColor = "#f1d012";
             }
-            else if (car.rpm <= car.powerbandMax) {
+            else if (liveShiftQuality === "PERFECT") {
                 // PERFECT
-                shiftLightColor = "#33ff33";
+                shiftLightColor = "#55f317";
             }
             else {
                 // LATE
-                shiftLightColor = "#ff3333";
+                shiftLightColor = "#fd3e1c";
             }
         }
         ctx.fillStyle = shiftLightColor;
@@ -255,7 +294,7 @@ export const UI = {
         ctx.textBaseline = "middle";
         ctx.fillText(car.gear.toString(), centerX, centerY + 32);
         // ===== DRAW SPEED INSIDE TACH =====
-        let tachSpeed = car.spd * 20;
+        let tachSpeed = speedToMph(car.spd);
         let tachLabel = "MPH";
         if (Options.speedUnit === "KMH") {
             tachSpeed *= 1.60934;
@@ -288,6 +327,64 @@ export const UI = {
         ctx.fillStyle = "#aaa";
         ctx.font = "bold 9px Arial";
         ctx.fillText("SPIN", centerX - 105, centerY + 18);
+        // ===== BOOST GAUGE =====
+        const boostPsi = Math.max(0, car.boostPsi || 0);
+        const hasBoost = (car.forcedInductionType === "turbo" ||
+            car.forcedInductionType === "supercharger") &&
+            boostPsi > 0.05;
+        const boostX = centerX + 112;
+        const boostY = centerY - 100;
+        const boostRadius = 24;
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(boostX, boostY, boostRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        const boostMaxPsi = 18;
+        const boostMajorStep = Options.boostUnit === "BAR"
+            ? 0.5 / 0.0689476
+            : 5;
+        const boostMinorStep = Options.boostUnit === "BAR"
+            ? 0.25 / 0.0689476
+            : 2.5;
+        for (let markPsi = 0; markPsi <= boostMaxPsi + 0.01; markPsi += boostMinorStep) {
+            const markRatio = Math.min(markPsi / boostMaxPsi, 1);
+            const markAngle = -Math.PI / 2 + markRatio * Math.PI * 2;
+            const isMajorMark = Math.abs(markPsi / boostMajorStep - Math.round(markPsi / boostMajorStep)) < 0.04;
+            const innerRadius = boostRadius - (isMajorMark ? 8 : 5);
+            const outerRadius = boostRadius - 1;
+            ctx.strokeStyle =
+                isMajorMark ? "#d8d8d8" : "#777";
+            ctx.lineWidth =
+                isMajorMark ? 2 : 1;
+            ctx.beginPath();
+            ctx.moveTo(boostX + Math.cos(markAngle) * innerRadius, boostY + Math.sin(markAngle) * innerRadius);
+            ctx.lineTo(boostX + Math.cos(markAngle) * outerRadius, boostY + Math.sin(markAngle) * outerRadius);
+            ctx.stroke();
+        }
+        const boostRatio = Math.min(boostPsi / boostMaxPsi, 1);
+        const boostAngle = -Math.PI / 2 + boostRatio * Math.PI * 2;
+        ctx.strokeStyle = hasBoost ? "#33ccff" : "#333";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(boostX, boostY, boostRadius - 5, -Math.PI / 2, boostAngle);
+        ctx.stroke();
+        ctx.strokeStyle = hasBoost ? "#f5f5f5" : "#555";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(boostX, boostY);
+        ctx.lineTo(boostX + Math.cos(boostAngle) * (boostRadius - 7), boostY + Math.sin(boostAngle) * (boostRadius - 7));
+        ctx.stroke();
+        const boostValue = Options.boostUnit === "BAR"
+            ? boostPsi * 0.0689476
+            : boostPsi;
+        ctx.fillStyle = "#ddd";
+        ctx.font = "bold 8px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(Options.boostUnit === "BAR"
+            ? boostValue.toFixed(1)
+            : Math.round(boostValue).toString(), boostX, boostY + 4);
+        ctx.fillText(Options.boostUnit, boostX, boostY + 17);
     },
     drawShiftIndicator(ctx, x, y) { },
     updateRaceSummary(game) {
@@ -300,6 +397,28 @@ export const UI = {
         const playerWon = game.raceReward === 100;
         summary.classList.remove("hidden");
         summary.style.display = "block";
+        if (game.runMode === "practice" || game.runMode === "testDrive") {
+            const runLabel = game.runMode === "testDrive"
+                ? "Test Drive"
+                : "Practice";
+            const bestKey = game.playerCar.bodyId + ":" + game.trackLength;
+            const bestTime = game.practiceBestTimes
+                ? game.practiceBestTimes[bestKey]
+                : 0;
+            title.innerText = runLabel + " Complete";
+            playerTime.innerText =
+                "Time: " +
+                    (game.playerFinishTime > 0 ? game.playerFinishTime.toFixed(2) + "s" : "DNF");
+            aiTime.innerText =
+                "Car: " + (game.runCarName || game.playerCar.name);
+            difference.innerText =
+                bestTime > 0
+                    ? "Best: " + bestTime.toFixed(2) + "s"
+                    : "Best: --";
+            reward.innerText =
+                "No cash earned in " + runLabel + ".";
+            return;
+        }
         title.innerText = playerWon ? "Victory!" : "Defeat";
         playerTime.innerText =
             "Player Time: " +

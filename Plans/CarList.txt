@@ -1,22 +1,150 @@
-Car list
-1st car: (Starter) Mazda MX-5 shaped = Maru MK-5 2012 in-game name(Done)
-2nd car: Volkswagen Golf GTI MK2 shaped,  Swag GG V2 1992 in-game name(Done)
-3rd car: Honda Civic coupe 1999 shaped = Hanna Civilian 1999 in-game name(Done)
-4th car: Volkswagen New Beetle 2024 shaped = Swag Ladybug 2024 in-game name
-5th car: Chevy Bel Air 1950 shaped = Roulette Blair 1950 in-game name(Done)
-6th car: Subaru BRZ 2012 shaped = Subarashi Zen 2012 in-game name
-7th car: Toyota MR2 2002 shaped = Toiler Mister2 2002 in-game name
-8th car: Ford Focus 2007 shaped = Fjord Foresight 2007 in-game name
-9th car: Nissan 240SX shaped = Nexus  420XS in-game name
-10th car: Scion Xb 2015 shaped = Xion Expo 2015 in-game name
-11th car: Datsun 240z shaped = Destiny 420z in-game name
-12th car: GMC Syclone shaped = 1991 DMG Scythe in-game
-13th car: Chysler 200 = Christened 2000
-14th car: Nissan Altima 2012 = Nexus Ultimate 
+Tiers and upgrade multipliers:
+
+Tier E: x0.10
+Tier D: x0.25
+Tier C: x0.75
+Tier B: x1.00
+Tier A: x1.55
+Tier S: x2.10
+Tier R: x4
+
+
+===================================================================
+Car list:
+Tier E: 
+Volkswagen Camper = 
+Fiat 500 = 
+Suzuki Alto works = 
+Daihatsu Copen =
+Smart fortwo = 
+Scion IQ = Zion Intellect
+Lada Samara =
+Suzuki Cuppachino =
+Opel Kadett
+Mitsubishi Mirage =
+Skoda Favrit = 
+Daihatsu Mira = 
+Nissan Cherry = Nexus Berry
+Mazda 2 = Maru2
+Fiat Panda = 
+Zastava Yugo = 
+Ford F-100
+Honda Civic 1960 = Hanna Civilian 
+Toyota Carolla 1968 = 
+Fiat Punto =
+Mazda Eunos roadster =
 
 Bosses:
-15th car: Toyota AE Sprinter =
+Tier E(high end, x0.15 upgrade multiplier, total not in addition): 
+Toyota Yaris = 
+Gaz Volga = Gas Vulgar
+Volkswagen Beetle = 
+Honda Beat = Hanna Heat
+
+======================================================================
+|       Overhaul E -> D: +0.15 multiplier, -2% overhaul penalty      |
+======================================================================
+Tier D(Top Priority): 
+(Starter) Mazda MX-5 shaped = Maru MK-5 2012 in-game name(Done)
+Volkswagen Golf GTI MK2 = Swag GG V2 1992 in-game name(Done)
+Chevy Bel Air 1950 = Roulette Blair 1950 in-game name(Done)
+Honda Civic coupe 1999 = Hanna Civilian 1999 in-game name(Done)
+Chevy Monte-Carlo = Roulette Mont Blanc in-game name (done)
+Volkswagen New Beetle 2024 = Swag Ladybug 2024 in-game name
+Subaru BRZ 2012 = Subarashi Zen 2012 in-game name
+Toyota MR2 2002 = Tempura Mister2 2002 in-game name
+Ford Focus 2007 = Fjord Foresight 2007 in-game name
+Nissan 240SX shaped = Nexus  420XS in-game name
+Scion Xb 2015 = Zion Expo 2015 in-game name
+Datsun 240z = Destiny 420z in-game name
+Chysler 200 = Christened 2000
+Nissan D21 1990 =
+Ford Pinto = Fjord Burro
+Lada Kalina Sport =
+Nissan Altima 2012 = Nexus Ultimate 
+Chevy Cavlier: 
+Mazdaspeed6 : Maruspeed6
+Volkswagen XL Sport = Swag XS Proto 
+Škoda Octavia(AWD) = Codex Vibratio
+Toyota Celica: 
+1990 Honda Accord:
+Mini Cooper John Works: 
+Dodge Dart Rallye =
+Pontiac Solstace =
+Hyundai Veloster =
+Chrysler PT Cruiser =
+Pugeot 106 =
+
+Bosses:
+Tier D(high end, x0.30 upgrade multiplier, total not in addition): 
+Toyota AE Sprinter = Tempura
 16th car: Mitshubishi Gallant = Tetsubishi Galileo
-17th car: Buick Regal = Majestic
-18th car: Alfa Romeo Brera = Omega Baretta
+======================================================================
+|         Overhaul D -> C: +0.50 -3% overhaul penalty                |
+======================================================================
+Tier C:
+Dodge
+Nissan 350z
+Honda S2000
+GMC Syclone = 1991 DMG Scythe in-game
+Toyota Supra
+Nissan Skyline R34
+Honda NSX 
+Plymouth Barracuda
+Renault Clio v6 = 
+Mazda RX7
+Dodge Challenger R/T
+Lexus GS300 =
+Infiniti GS35
+Chevy Cheville =
+Mitsubishi Lancer Evo 4 =
+Subaru Impreza = 
+Pontiac Firebird
+Lotus Elise
+Mitsubishi FTO = 
+Acura Integra =
+Volkswagen Golf GTI R
+Buick Grand National = 
+Ford Puma =
+Impalla SS
+Mitsubishi Eclipse = Tetsubishi Vortex
+Holden Torana Sl/R 5000
+AMC Javelin = ACE Discus
+Ford Torino
+Chevy Cobalt SS
+Nissan Skyline 1980
+Oldsmobile 442 = 
+Ford Falcon
+Dodge Neon
+Nissan Silvia
+BMW M3 E34 =
+Monaro Bathurst GTS 350 
+Audi TT Quatro =
+Scion TC = Zion Tactic
+Honda Prelude =
+Caddlilac CTS =
+Lexus IS300
+Mercedes-Benz CLK 500
+Chrysler Valiant
+Chevy Corvette 1960: 
+Buick Rivera
+AMC Rebel = ACE Daredevil
+Mustang Boss =
+Plymouth Roadrunner
+Dodge Charger R/T
+Ruf CTR Yellowbird = RIF Goldbird
+
+Tier C(high end, x0.85 upgrade multiplier, total not in addition): 
+Alfa Romeo Brera = Omega Baretta
+Mazda RX8 =
+Camaro SS = 
+====================================================================
+|                      No overhaul yet                             |
+====================================================================
+
+B Class: 
+Lotus Carlton
+
+
 'Orbitron', sans-serif;
+

@@ -1,10 +1,13 @@
 import { SaveSystem } from "./save.js";
+import { Decals } from "./decals.js";
 export const Customize = {
     needlePrice: 25,
     hubPrice: 25,
     textPrice: 25,
     rimPrice: 150,
     paintPrice: 75,
+    underglowPrice: 125,
+    decalPrice: Decals.decalPrice,
     buyRimStyle(game, style) {
         if (game.money < this.rimPrice) {
             game.raceMessage = "Not enough money!";
@@ -71,6 +74,45 @@ export const Customize = {
         game.playerCar.paintColor = color;
         SaveSystem.save(game);
         game.raceMessage = "Car paint changed!";
+        game.raceMessageTimer = 2;
+    },
+    buyDecal(game, decalId, color = "#ffffff") {
+        var _a;
+        if (!game.playerCar)
+            return;
+        const decal = Decals.get(decalId);
+        if (decal.id === "none") {
+            game.playerCar.decalId = "none";
+            SaveSystem.save(game);
+            game.raceMessage = "Decal removed!";
+            game.raceMessageTimer = 2;
+            return;
+        }
+        const price = (_a = decal.price) !== null && _a !== void 0 ? _a : this.decalPrice;
+        if (game.money < price) {
+            game.raceMessage = "Not enough money!";
+            game.raceMessageTimer = 2;
+            return;
+        }
+        game.money -= price;
+        game.playerCar.decalId = decal.id;
+        game.playerCar.decalColor = decal.colorable ? color : "#ffffff";
+        SaveSystem.save(game);
+        game.raceMessage = "Decal applied!";
+        game.raceMessageTimer = 2;
+    },
+    buyUnderglowColor(game, color) {
+        if (!game.playerCar)
+            return;
+        if (game.money < this.underglowPrice) {
+            game.raceMessage = "Not enough money!";
+            game.raceMessageTimer = 2;
+            return;
+        }
+        game.money -= this.underglowPrice;
+        game.playerCar.underglowColor = color;
+        SaveSystem.save(game);
+        game.raceMessage = "Neon underglow changed!";
         game.raceMessageTimer = 2;
     }
 };

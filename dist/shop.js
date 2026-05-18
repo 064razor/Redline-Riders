@@ -1,19 +1,73 @@
 import { SaveSystem } from "./save.js";
-import { refreshDrivetrain } from "./garage.js";
+import { getDefaultTorqueCurve } from "./garage.js";
+import { getDisplacementTorqueCurve } from "./power.js";
+function syncGarageCar(game) {
+    if (!game || !game.playerCar || !game.garageCars)
+        return;
+    game.garageCars[game.playerCar.bodyId] =
+        game.playerCar;
+}
+function finishPurchase(game, message) {
+    syncGarageCar(game);
+    SaveSystem.save(game);
+    game.raceMessage = message;
+    game.raceMessageTimer = 2;
+}
+function formatDelta(label, amount, suffix = "") {
+    const sign = amount > 0 ? "+" : "";
+    return label + " " + sign + amount + suffix;
+}
+function finishUpgrade(game, name, deltas) {
+    finishPurchase(game, name + ": " + deltas.join(", "));
+}
+function hasDifferentPowerAdder(car, type) {
+    const current = car.forcedInductionType || "none";
+    return current !== "none" && current !== type;
+}
+function getPowerAdderName(type) {
+    if (type === "turbo")
+        return "turbo";
+    if (type === "supercharger")
+        return "supercharger";
+    if (type === "displacement")
+        return "displacement upgrade";
+    return "power adder";
+}
+function incompatiblePowerAdder(game, requestedType) {
+    var _a;
+    const currentType = ((_a = game.playerCar) === null || _a === void 0 ? void 0 : _a.forcedInductionType) || "none";
+    game.raceMessage =
+        "Cannot install " + getPowerAdderName(requestedType) +
+            " with " + getPowerAdderName(currentType) +
+            ". Fully uninstall the incompatible upgrades first.";
+    game.raceMessageTimer = 4;
+}
+function applyDisplacementCurve(car) {
+    const baseCurve = car.baseTorqueCurve ||
+        getDefaultTorqueCurve(car.bodyId);
+    car.baseTorqueCurve =
+        baseCurve;
+    car.torqueCurve =
+        getDisplacementTorqueCurve(baseCurve, car.displacementLevel || 0);
+}
+function notEnoughMoney(game) {
+    game.raceMessage = "Not enough money!";
+    game.raceMessageTimer = 2;
+}
 export const Shop = {
     buyTires(game) {
-        if (game.money >= game.playerCar.tirePrice) {
-            game.money -= game.playerCar.tirePrice;
-            game.playerCar.grip += 1;
-            game.playerCar.tireLevel++;
-            game.playerCar.tirePrice += 150;
-            SaveSystem.save(game);
-            game.raceMessage = "Tires upgraded!";
-            game.raceMessageTimer = 2;
+        const car = game.playerCar;
+        if (game.money >= car.tirePrice) {
+            game.money -= car.tirePrice;
+            car.grip += 120;
+            car.tireLevel++;
+            car.tirePrice += 150;
+            finishUpgrade(game, "Tires upgraded", [
+                formatDelta("Grip", 120)
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
         }
     },
     buyEngine(game) {
@@ -22,138 +76,30 @@ export const Shop = {
             game.money -= car.enginePrice;
             car.hp += 25;
             car.engineLevel++;
-            car.enginePrice += 2200;
-            SaveSystem.save(game);
-            game.raceMessage = "Engine upgraded!";
-            game.raceMessageTimer = 2;
+            car.enginePrice += 200;
+            finishUpgrade(game, "Engine upgraded", [
+                formatDelta("HP", 25)
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
-        }
-    },
-    buyPistons(game) {
-        const car = game.playerCar;
-        if (game.money >= car.pistonPrice) {
-            game.money -= car.pistonPrice;
-            car.hp += 10;
-            car.torque += 6;
-            car.pistonLevel++;
-            car.pistonPrice =
-                Math.floor(car.pistonPrice * 1.45);
-            refreshDrivetrain(car);
-            SaveSystem.save(game);
-            game.raceMessage =
-                "Pistons upgraded!";
-            game.raceMessageTimer = 2;
-        }
-        else {
-            game.raceMessage =
-                "Not enough money!";
-            game.raceMessageTimer = 2;
-        }
-    },
-    buyCrank(game) {
-        const car = game.playerCar;
-        if (game.money >= car.crankPrice) {
-            game.money -= car.crankPrice;
-            car.hp += 6;
-            car.torque += 12;
-            car.crankLevel++;
-            car.crankPrice =
-                Math.floor(car.crankPrice * 1.5);
-            refreshDrivetrain(car);
-            SaveSystem.save(game);
-            game.raceMessage =
-                "Crank upgraded!";
-            game.raceMessageTimer = 2;
-        }
-        else {
-            game.raceMessage =
-                "Not enough money!";
-            game.raceMessageTimer = 2;
-        }
-    },
-    buyIntake(game) {
-        const car = game.playerCar;
-        if (game.money >= car.intakePrice) {
-            game.money -= car.intakePrice;
-            car.hp += 4;
-            car.torque += 3;
-            car.powerbandMax += 35;
-            car.intakeLevel++;
-            car.intakePrice =
-                Math.floor(car.intakePrice * 1.4);
-            refreshDrivetrain(car);
-            SaveSystem.save(game);
-            game.raceMessage =
-                "Intake upgraded!";
-            game.raceMessageTimer = 2;
-        }
-        else {
-            game.raceMessage =
-                "Not enough money!";
-            game.raceMessageTimer = 2;
-        }
-    },
-    buyTopEnd(game) {
-        const car = game.playerCar;
-        if (game.money >= car.topEndPrice) {
-            game.money -= car.topEndPrice;
-            car.hp += 8;
-            car.maxRPM += 75;
-            car.powerbandMax += 75;
-            car.topEndLevel++;
-            car.topEndPrice =
-                Math.floor(car.topEndPrice * 1.55);
-            refreshDrivetrain(car);
-            SaveSystem.save(game);
-            game.raceMessage =
-                "Top end upgraded!";
-            game.raceMessageTimer = 2;
-        }
-        else {
-            game.raceMessage =
-                "Not enough money!";
-            game.raceMessageTimer = 2;
-        }
-    },
-    buyBottomEnd(game) {
-        const car = game.playerCar;
-        if (game.money >= car.bottomEndPrice) {
-            game.money -= car.bottomEndPrice;
-            car.hp += 13;
-            car.torque += 10;
-            car.bottomEndLevel++;
-            car.bottomEndPrice =
-                Math.floor(car.bottomEndPrice * 1.6);
-            refreshDrivetrain(car);
-            SaveSystem.save(game);
-            game.raceMessage =
-                "Bottom end upgraded!";
-            game.raceMessageTimer = 2;
-        }
-        else {
-            game.raceMessage =
-                "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
         }
     },
     buyTransmission(game) {
-        if (game.money >= game.playerCar.transmissionPrice) {
-            game.money -= game.playerCar.transmissionPrice;
-            game.playerCar.topSpeed += 10;
-            const lastGear = game.playerCar.gearMaxSpeeds.length - 1;
-            game.playerCar.gearMaxSpeeds[lastGear] += 10;
-            game.playerCar.transmissionLevel++;
-            game.playerCar.transmissionPrice += 350;
-            SaveSystem.save(game);
-            game.raceMessage = "Transmission upgraded!";
-            game.raceMessageTimer = 2;
+        const car = game.playerCar;
+        if (game.money >= car.transmissionPrice) {
+            game.money -= car.transmissionPrice;
+            car.topSpeed += 10;
+            const lastGear = car.gearMaxSpeeds.length - 1;
+            car.gearMaxSpeeds[lastGear] += 10;
+            car.transmissionLevel++;
+            car.transmissionPrice += 350;
+            finishUpgrade(game, "Transmission upgraded", [
+                formatDelta("Top speed", 10, " MPH")
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
         }
     },
     buyExhaust(game) {
@@ -163,44 +109,115 @@ export const Shop = {
             car.hp += 8;
             car.exhaustLevel++;
             car.exhaustPrice += 120;
-            SaveSystem.save(game);
-            game.raceMessage = "Exhaust upgraded!";
-            game.raceMessageTimer = 2;
+            finishUpgrade(game, "Exhaust upgraded", [
+                formatDelta("HP", 8)
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
         }
     },
     buyECU(game) {
         const car = game.playerCar;
         if (game.money >= car.ecuPrice) {
             game.money -= car.ecuPrice;
-            car.hp += 3;
-            car.maxRPM += 35;
+            car.hp += 5;
+            car.maxRPM += 55;
             car.powerbandMax += 55;
-            // Move the whole powerband upward, but not as much as max RPM.
-            // This makes the extra RPM useful without making the shift zone too easy.
-            car.powerbandMin += 25;
-            car.powerbandMax += 45;
-            // Safety cap: powerband should never pass the new redline.
-            if (car.powerbandMax > car.maxRPM - 35) {
-                car.powerbandMax = car.maxRPM - 45;
-            }
-            // Safety cap: minimum should stay below maximum.
-            if (car.powerbandMin > car.powerbandMax - 900) {
-                car.powerbandMin = car.powerbandMax - 900;
-            }
             car.ecuLevel++;
-            refreshDrivetrain(car);
-            car.ecuPrice += 135;
-            SaveSystem.save(game);
-            game.raceMessage = "ECU upgraded!";
-            game.raceMessageTimer = 2;
+            car.ecuPrice += 160;
+            finishUpgrade(game, "ECU upgraded", [
+                formatDelta("HP", 5),
+                formatDelta("Redline", 55, " RPM")
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
+        }
+    },
+    buyTurbo(game) {
+        var _a;
+        const car = game.playerCar;
+        if (hasDifferentPowerAdder(car, "turbo")) {
+            incompatiblePowerAdder(game, "turbo");
+            return;
+        }
+        const price = (_a = car.turboPrice) !== null && _a !== void 0 ? _a : 1800;
+        if (game.money >= price) {
+            game.money -= price;
+            car.forcedInductionType = "turbo";
+            car.turboLevel = (car.turboLevel || 0) + 1;
+            car.turboPrice = price + 900;
+            car.hp += 10;
+            car.torque += 2;
+            car.powerbandMax += 70;
+            car.turboSpool = 0;
+            finishUpgrade(game, "Turbo upgraded", [
+                formatDelta("Peak boost", 2.25, " PSI"),
+                formatDelta("HP", 10),
+                formatDelta("Powerband", 70, " RPM")
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
+        }
+    },
+    buySupercharger(game) {
+        var _a;
+        const car = game.playerCar;
+        if (hasDifferentPowerAdder(car, "supercharger")) {
+            incompatiblePowerAdder(game, "supercharger");
+            return;
+        }
+        const price = (_a = car.superchargerPrice) !== null && _a !== void 0 ? _a : 1700;
+        if (game.money >= price) {
+            game.money -= price;
+            car.forcedInductionType = "supercharger";
+            car.superchargerLevel = (car.superchargerLevel || 0) + 1;
+            car.superchargerPrice = price + 850;
+            car.hp += 5;
+            car.torque += 10;
+            car.powerbandMin =
+                Math.max(1000, (car.powerbandMin || 3000) - 45);
+            finishUpgrade(game, "Supercharger upgraded", [
+                formatDelta("Peak boost", 1.35, " PSI"),
+                formatDelta("HP", 5),
+                formatDelta("Torque", 10),
+                "Instant boost"
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
+        }
+    },
+    buyDisplacement(game) {
+        var _a;
+        const car = game.playerCar;
+        if (hasDifferentPowerAdder(car, "displacement")) {
+            incompatiblePowerAdder(game, "displacement");
+            return;
+        }
+        const price = (_a = car.displacementPrice) !== null && _a !== void 0 ? _a : 1450;
+        if (game.money >= price) {
+            game.money -= price;
+            car.forcedInductionType = "displacement";
+            car.displacementLevel = (car.displacementLevel || 0) + 1;
+            car.displacementPrice = price + 720;
+            car.hp += 10;
+            car.torque += 18;
+            car.powerbandMin =
+                Math.max(1000, (car.powerbandMin || 3000) - 80);
+            car.powerbandMax =
+                Math.max(car.powerbandMin + 900, (car.powerbandMax || 5500) - 35);
+            applyDisplacementCurve(car);
+            finishUpgrade(game, "Displacement increased", [
+                formatDelta("HP", 10),
+                formatDelta("Torque", 18),
+                "Broader NA curve"
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
         }
     },
     buyWeightReduction(game) {
@@ -219,29 +236,27 @@ export const Shop = {
             }
             car.weightReductionLevel++;
             car.weightReductionPrice += 220;
-            SaveSystem.save(game);
-            game.raceMessage = "Weight reduced!";
-            game.raceMessageTimer = 2;
+            finishUpgrade(game, "Weight reduced", [
+                formatDelta("Weight", -120, " lbs")
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
         }
     },
     buySuspension(game) {
         const car = game.playerCar;
         if (game.money >= car.suspensionPrice) {
             game.money -= car.suspensionPrice;
-            car.grip += 0.08;
+            car.grip += 10;
             car.suspensionLevel++;
             car.suspensionPrice += 170;
-            SaveSystem.save(game);
-            game.raceMessage = "Suspension upgraded!";
-            game.raceMessageTimer = 2;
+            finishUpgrade(game, "Suspension upgraded", [
+                formatDelta("Grip", 10)
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
         }
     },
     buyFlywheel(game) {
@@ -259,13 +274,98 @@ export const Shop = {
             }
             car.flywheelLevel++;
             car.flywheelPrice += 190;
-            SaveSystem.save(game);
-            game.raceMessage = "Flywheel upgraded!";
-            game.raceMessageTimer = 2;
+            finishUpgrade(game, "Flywheel upgraded", [
+                formatDelta("Shift time", -0.02, "s")
+            ]);
         }
         else {
-            game.raceMessage = "Not enough money!";
-            game.raceMessageTimer = 2;
+            notEnoughMoney(game);
+        }
+    },
+    buyPistons(game) {
+        const car = game.playerCar;
+        if (game.money >= car.pistonPrice) {
+            game.money -= car.pistonPrice;
+            car.hp += 10;
+            car.torque += 6;
+            car.pistonLevel++;
+            car.pistonPrice += 260;
+            finishUpgrade(game, "Pistons upgraded", [
+                formatDelta("HP", 10),
+                formatDelta("Torque", 6)
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
+        }
+    },
+    buyCrank(game) {
+        const car = game.playerCar;
+        if (game.money >= car.crankPrice) {
+            game.money -= car.crankPrice;
+            car.hp += 6;
+            car.torque += 12;
+            car.crankLevel++;
+            car.crankPrice += 280;
+            finishUpgrade(game, "Crank upgraded", [
+                formatDelta("HP", 6),
+                formatDelta("Torque", 12)
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
+        }
+    },
+    buyIntake(game) {
+        const car = game.playerCar;
+        if (game.money >= car.intakePrice) {
+            game.money -= car.intakePrice;
+            car.hp += 7;
+            car.torque += 4;
+            car.intakeLevel++;
+            car.intakePrice += 180;
+            finishUpgrade(game, "Intake upgraded", [
+                formatDelta("HP", 7),
+                formatDelta("Torque", 4)
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
+        }
+    },
+    buyTopEnd(game) {
+        const car = game.playerCar;
+        if (game.money >= car.topEndPrice) {
+            game.money -= car.topEndPrice;
+            car.hp += 14;
+            car.maxRPM += 90;
+            car.powerbandMax += 90;
+            car.topEndLevel++;
+            car.topEndPrice += 320;
+            finishUpgrade(game, "Top end upgraded", [
+                formatDelta("HP", 14),
+                formatDelta("Redline", 90, " RPM")
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
+        }
+    },
+    buyBottomEnd(game) {
+        const car = game.playerCar;
+        if (game.money >= car.bottomEndPrice) {
+            game.money -= car.bottomEndPrice;
+            car.hp += 8;
+            car.torque += 16;
+            car.bottomEndLevel++;
+            car.bottomEndPrice += 340;
+            finishUpgrade(game, "Bottom end upgraded", [
+                formatDelta("HP", 8),
+                formatDelta("Torque", 16)
+            ]);
+        }
+        else {
+            notEnoughMoney(game);
         }
     }
 };

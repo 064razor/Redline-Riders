@@ -1,4 +1,6 @@
 import { UI } from "./ui.js";
+import { mphToSpeed } from "./speed.js";
+import { getShiftQuality } from "./power.js";
 
 console.log("input loaded");
 
@@ -41,7 +43,7 @@ export const Input = {
         if (car.gear >= car.gearRatios.length) return;
 		
 		const currentGearMaxSpeed =
-            car.gearMaxSpeeds[car.gear - 1] / 20;
+            mphToSpeed(car.gearMaxSpeeds[car.gear - 1]);
 
         const currentGearProgress =
             car.spd / currentGearMaxSpeed;
@@ -58,18 +60,7 @@ export const Input = {
             car.rpm;
 
         // ===== SHIFT QUALITY =====
-        if (rpm < car.powerbandMin) {
-            result = "EARLY";
-        }
-        else if (rpm < car.powerbandMax * 0.92) {
-            result = "GOOD";
-        }
-        else if (rpm <= car.powerbandMax) {
-            result = "PERFECT";
-        }
-        else {
-            result = "LATE";
-        }
+        result = getShiftQuality(car, rpm, car.gear);
 
         // ===== GEAR RATIO RPM DROP =====
         const oldGearRatio =
@@ -103,19 +94,28 @@ export const Input = {
         // ===== MOMENTUM EFFECT =====
         // Shifting should not act like a huge speed boost.
         // These are small feel adjustments only.
+        let shiftJoltStrength = 0.9;
+
         if (result === "EARLY") {
             car.spd *= 0.985;
         }
         else if (result === "GOOD") {
             car.spd *= 1.003;
             game.bonusReward += 2;
+            shiftJoltStrength = 1;
         }
         else if (result === "PERFECT") {
             car.spd *= 1.006;
             game.bonusReward += 5;
+            shiftJoltStrength = 1.15;
         }
         else {
             car.spd *= 0.975;
+            shiftJoltStrength = 1.05;
+        }
+
+        if (game.triggerShiftJolt) {
+            game.triggerShiftJolt(car, shiftJoltStrength);
         }
 
         UI.triggerShiftFeedback(result);

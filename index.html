@@ -46,7 +46,8 @@
         }
 
         select,
-        input[type="color"] {
+        input[type="color"],
+        input[type="number"] {
             background: #eee;
             color: black;
             border: 1px solid #777;
@@ -96,12 +97,59 @@
             flex-wrap: wrap;
         }
 
+
+        #saveProfiles {
+            display: grid;
+            gap: 8px;
+            margin: 10px 0 12px;
+            text-align: left;
+        }
+
+        .saveProfileButton {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            text-align: left;
+            align-items: center;
+        }
+
+        .saveProfileButton.selected {
+            border-color: #ff3333;
+            box-shadow: 0 0 8px rgba(255, 50, 50, 0.75);
+        }
+
+        .saveProfileName {
+            font-weight: bold;
+        }
+
+        .saveProfileMeta {
+            color: #bbb;
+            font-size: 12px;
+        }
+
+        #saveProfileNameInput {
+            width: min(320px, 88%);
+            background: #eee;
+            color: black;
+            border: 1px solid #777;
+            padding: 6px;
+        }
+
+        #importSaveInput {
+            display: none;
+        }
         #raceMessage {
-            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(18px, 3vw, 28px);
             font-weight: bold;
             color: #33ff33;
-            height: 40px;
+            min-height: 44px;
             margin-top: 10px;
+            padding: 0 10px;
+            text-shadow: 0 0 8px rgba(51, 255, 51, 0.45);
         }
 
         #raceSummary {
@@ -127,6 +175,183 @@
             line-height: 1.6;
         }
 
+        #opponentSelector {
+            margin: 12px auto 4px;
+            max-width: 420px;
+        }
+
+        #opponentLabel {
+            color: #ccc;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        #opponentName {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f4f4ff;
+            margin-bottom: 4px;
+        }
+
+        #opponentCarousel {
+            display: grid;
+            grid-template-columns: 54px 1fr 54px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .opponentArrow {
+            height: 96px;
+            padding: 0;
+            font-size: 58px;
+            line-height: 1;
+            color: #e8e8f4;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .opponentArrow:hover {
+            color: #ff3333;
+            border: none;
+            box-shadow: none;
+        }
+
+        #opponentCanvas {
+            width: 100%;
+            height: 112px;
+            background: #111;
+            border: 3px solid #d8d8e6;
+            margin-top: 0;
+        }
+
+        #randomOpponentRow {
+            color: #ddd;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        #opponentSelector.randomOpponent #opponentName,
+        #opponentSelector.randomOpponent #opponentCanvas,
+        #opponentSelector.randomOpponent .opponentArrow {
+            opacity: 0.45;
+        }
+
+        #rimSelector {
+            margin: 6px auto 8px;
+            max-width: 280px;
+        }
+
+        #rimName {
+            font-size: 16px;
+            font-weight: bold;
+            color: #f4f4ff;
+            margin-bottom: 4px;
+        }
+
+        #rimCarousel {
+            display: grid;
+            grid-template-columns: 38px 1fr 38px;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rimArrow {
+            height: 58px;
+            padding: 0;
+            font-size: 36px;
+            line-height: 1;
+            color: #e8e8f4;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .rimArrow:hover {
+            color: #ff3333;
+            border: none;
+            box-shadow: none;
+        }
+
+        #rimCanvas {
+            width: 100%;
+            height: 64px;
+            background: #111;
+            border: 2px solid #d8d8e6;
+            margin-top: 0;
+        }
+
+
+        #garageInfo,
+        #dealerListings {
+            text-align: left;
+        }
+
+        .ownedCarList {
+            display: grid;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .ownedCarButton {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .ownedCarButton.selected {
+            border-color: #ff3333;
+            box-shadow: 0 0 8px rgba(255, 50, 50, 0.65);
+        }
+
+        .carStatPanel {
+            border: 1px solid #333;
+            background: #151515;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .dealerViewer {
+            min-height: 260px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 12px;
+        }
+
+        .dealerCard {
+            border: 1px solid #333;
+            background: #181818;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .dealerCarName {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .dealerBio {
+            color: #d0d0d0;
+            margin: 6px auto 10px;
+            max-width: 440px;
+        }
+
+        .dealerNav {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .dealerNav button {
+            min-width: 130px;
+        }
         #gameArea {
             margin-top: 10px;
             display: flex;
@@ -137,7 +362,31 @@
         }
 
         #shiftMsg {
-            height: 25px;
+            min-height: 34px;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px currentColor;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 120ms ease, transform 120ms ease;
+        }
+
+        #shiftMsg.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #shiftMsg.perfect {
+            color: #33ff33;
+        }
+
+        #shiftMsg.good {
+            color: #ffff33;
+        }
+
+        #shiftMsg.bad {
+            color: #ff3333;
         }
 
         #countdown {
@@ -174,31 +423,78 @@
     <div>
         <label>Track Length:</label>
         <select id="trackSelect">
-            <option value="40">Short</option>
-            <option value="80" selected>Medium</option>
-            <option value="140">Long</option>
-            <option value="220">Extreme</option>
+            <option value="90">Short (1/8 Mile)</option>
+            <option value="180" selected>Medium (1/4 Mile)</option>
+            <option value="360">Long (1/2 Mile)</option>
+            <option value="720">Full Mile</option>
+            <option value="1080">Extreme (1.5 Mile)</option>
+            <option value="custom">Custom</option>
         </select>
+    </div>
+
+    <div id="customTrackRow" class="hidden">
+        <label>Custom Distance:</label>
+        <input
+            id="customTrackInput"
+            type="number"
+            min="45"
+            max="1440"
+            step="10"
+            value="180"
+        >
     </div>
 
     <div>
         <label>Difficulty:</label>
         <select id="difficultySelect">
+            <option value="veryEasy">Very Easy</option>
             <option value="easy">Easy</option>
             <option value="normal" selected>Normal</option>
             <option value="hard">Hard</option>
+            <option value="veryHard">Very Hard</option>
         </select>
+    </div>
+
+    <div id="opponentSelector">
+        <div id="opponentLabel">Opponent Select</div>
+        <div id="opponentName"></div>
+
+        <div id="opponentCarousel">
+            <button id="opponentPrevBtn" class="opponentArrow">&lt;</button>
+            <canvas id="opponentCanvas" width="300" height="112"></canvas>
+            <button id="opponentNextBtn" class="opponentArrow">&gt;</button>
+        </div>
+
+        <label id="randomOpponentRow">
+            <input id="randomOpponentToggle" type="checkbox">
+            Random opponent
+        </label>
     </div>
 
     <div class="buttonRow">
         <button id="startBtn">Start Race</button>
+        <button id="practiceBtn">Practice</button>
     </div>
 
     <div id="controls">
         <div><b>Controls:</b></div>
-        <div>↑ Hold = Rev engine</div>
+        <div>Up Arrow = Rev engine</div>
         <div>Space = Shift gear</div>
     </div>
+</div>
+
+<div id="garagePreviewSlot" class="menuPanel hidden">
+    <canvas
+        id="garageCanvas"
+        width="420"
+        height="160"
+        style="
+            display:block;
+            background:#0b0b0b;
+            border:1px solid #c0c0c0;
+            margin:0 auto;
+        "
+    ></canvas>
 </div>
 
 <div id="garagePanel" class="menuPanel hidden">
@@ -228,6 +524,14 @@
         <button id="buyBottomEnd"></button>
     </div>
 
+    <div class="panelTitle" style="margin-top:18px;">Power Adder</div>
+
+    <div class="buttonRow">
+        <button id="buyTurbo"></button>
+        <button id="buySupercharger"></button>
+        <button id="buyDisplacement"></button>
+    </div>
+
     <div class="panelTitle" style="margin-top:18px;">Grip</div>
 
     <div class="buttonRow">
@@ -247,20 +551,22 @@
 <div id="dealerPanel" class="menuPanel hidden">
     <div class="panelTitle">Dealership</div>
     <div id="dealerListings"></div>
+    <div class="dealerNav">
+        <button id="dealerPrevBtn">Previous</button>
+        <button id="dealerNextBtn">Next</button>
+    </div>
 </div>
 
 <div id="customizePanel" class="menuPanel hidden">
     <div class="panelTitle">Customization</div>
 
-    <div>
-        <label>Rims:</label>
-        <select id="rimStyleSelect">
-            <option value="classic5">Classic 5-Spoke</option>
-            <option value="split6">Split 6-Spoke</option>
-            <option value="mesh">Street Mesh</option>
-            <option value="deepDish">Deep Dish</option>
-            <option value="star">Star Racer</option>
-        </select>
+    <div id="rimSelector">
+        <div id="rimName"></div>
+        <div id="rimCarousel">
+            <button id="rimPrevBtn" class="rimArrow">&lt;</button>
+            <canvas id="rimCanvas" width="190" height="64"></canvas>
+            <button id="rimNextBtn" class="rimArrow">&gt;</button>
+        </div>
         <button id="buyRimStyle">Buy Rims</button>
     </div>
 
@@ -268,6 +574,18 @@
         <label>Car Paint:</label>
         <input id="paintColorPicker" type="color" value="#ffffff">
         <button id="buyPaintColor"></button>
+    </div>
+
+    <div>
+        <label>Neon Underglow:</label>
+        <input id="underglowColorPicker" type="color" value="#33aaff">
+        <button id="buyUnderglowColor"></button>
+    </div>
+    <div>
+        <label>Decal:</label>
+        <select id="decalSelect"></select>
+        <input id="decalColorPicker" type="color" value="#ffffff">
+        <button id="buyDecal"></button>
     </div>
 
     <div class="panelTitle" style="margin-top:12px;">Tachometer Customization</div>
@@ -307,12 +625,34 @@
     <span id="audioVolumeValue">100%</span>
 </div>
 
+<div>
+    <label>Opponent Audio:</label>
+    <input id="opponentAudioVolumeSlider" type="range" min="0" max="100" value="15">
+    <span id="opponentAudioVolumeValue">15%</span>
+</div>
+
     <div>
         <label>Speed Unit:</label>
         <select id="unitSelect">
             <option value="MPH">MPH</option>
             <option value="KMH">KM/H</option>
         </select>
+    </div>
+
+    <div>
+       <label>Weight Unit:</label>
+       <select id="weightUnitSelect">
+            <option value="LBS" selected>lbs</option>
+            <option value="KG">kg</option>
+        </select>
+    </div>
+
+    <div>
+    <label>Torque Unit:</label>
+        <select id="torqueUnitSelect">
+            <option value="LBFT" selected>lb-ft</option>
+            <option value="NM">Nm</option>
+     </select>
     </div>
 
     <div>
@@ -330,22 +670,38 @@
             <option value="left">Left</option>
         </select>
     </div>
+
+    <div>
+        <label>Boost Unit:</label>
+        <select id="boostUnitSelect">
+            <option value="PSI" selected>PSI</option>
+            <option value="BAR">BAR</option>
+        </select>
+    </div>
 </div>
 
 <div id="savePanel" class="menuPanel hidden">
-    <div class="panelTitle">Save / Load</div>
+    <div class="panelTitle">Save Profiles</div>
 
-    <button id="saveBtn">Save Game</button>
+    <div id="saveProfiles"></div>
 
-    <select id="saveSlotSelect">
-        <option value="1">Slot 1</option>
-        <option value="2">Slot 2</option>
-        <option value="3">Slot 3</option>
-        <option value="4">Slot 4</option>
-        <option value="5">Slot 5</option>
-    </select>
+    <div>
+        <label>Profile Name:</label>
+        <input id="saveProfileNameInput" type="text" maxlength="32" value="Profile 1">
+    </div>
 
-    <button id="loadSlotBtn">Load Slot</button>
+    <div class="buttonRow">
+        <button id="saveBtn">Save</button>
+        <button id="loadSlotBtn">Load</button>
+        <button id="renameSaveBtn">Rename</button>
+        <button id="deleteSaveBtn">Delete</button>
+    </div>
+
+    <div class="buttonRow">
+        <button id="exportSaveBtn">Export</button>
+        <button id="importSaveBtn">Import</button>
+        <input id="importSaveInput" type="file" accept="application/json,.json">
+    </div>
 </div>
 
 <div id="raceMessage"></div>
@@ -359,6 +715,7 @@
 	
 	<div class="buttonRow">
     <button id="raceAgainBtn">Race Again?</button>
+    <button id="backToGarageBtn">Garage</button>
 	</div>
 </div>
 

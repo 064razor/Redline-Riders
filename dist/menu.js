@@ -1,6 +1,7 @@
 export const Menu = {
     panels: [
         "racePanel",
+        "garagePreviewSlot",
         "garagePanel",
         "upgradePanel",
         "dealerPanel",
@@ -58,10 +59,40 @@ export const Menu = {
             !game.raceSummaryVisible) {
             return;
         }
+        if (game &&
+            game.raceSummaryVisible &&
+            !game.raceStarted &&
+            !game.countdownActive) {
+            game.raceSummaryVisible = false;
+            const summary = document.getElementById("raceSummary");
+            if (summary) {
+                summary.classList.add("hidden");
+                summary.style.display = "none";
+            }
+            const gameCanvas = document.getElementById("gameCanvas");
+            const tachCanvas = document.getElementById("tachCanvas");
+            if (gameCanvas) {
+                gameCanvas.style.display = "none";
+            }
+            if (tachCanvas) {
+                tachCanvas.style.display = "none";
+            }
+        }
+        if (game && game.restoreTestDriveCar && panelId !== "racePanel") {
+            game.restoreTestDriveCar();
+        }
         this.hideAll();
         const panel = document.getElementById(panelId);
         if (panel) {
             panel.classList.remove("hidden");
+        }
+        if (panelId === "garagePanel" ||
+            panelId === "upgradePanel" ||
+            panelId === "customizePanel") {
+            const preview = document.getElementById("garagePreviewSlot");
+            if (preview) {
+                preview.classList.remove("hidden");
+            }
         }
     }
 };

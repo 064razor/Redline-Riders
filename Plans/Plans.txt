@@ -1,0 +1,40 @@
+Visual:
++Car icons at dealership
++Clearer car class/readiness labels in dealership
++More polished race summary presentation
++Small menu/UI sound set beyond save/load chime
++Modular body part compatibility
+
+Gameplay:
++Event menu
++Tournament events
++Rival opponents
+
+Balance:
++Per-car drag coefficient
++Class-based opponent pools
++Upgrade curve tuning for NA, Turbo, Super, and NA+
++Race-length-specific payout tuning
++Difficulty tuning now that torque curves and dynamic shift windows exist
+
+Gameplay loop:
++Early-game progression pass
++Starter-class car identity pass
++Dealership pricing pass after balance stabilizes
+
+Fix:
++Audit existing saves after balance migrations
++Check all cars across 1/8, 1/4, 1/2, and full mile distances
++Verify boosted cars build and lose PSI cleanly during normal races
+
+Recently completed:
++Real per-car torque curves
++Dynamic boost/PSI behavior for Turbo and Super
++Curve-based shift windows and AI shift behavior
++Upgrade stat feedback messages
++Save/load chime
++Boost gauge notches and repositioning
++Hanna Civilian stock balance pass
++Roulette Mont Blanc stock balance pass
++Practice gamemode
++Dealership Test Drive
