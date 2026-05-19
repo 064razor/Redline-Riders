@@ -140,8 +140,11 @@ function drawCarBody(
         car.drivetrain ||
         (
             car.bodyId === "swagGG2" ||
-            car.bodyId === "hannaCivilian"
+            car.bodyId === "hannaCivilian" ||
+            car.bodyId === "swagLadybug2024"
                 ? "FWD"
+                : car.bodyId === "scholarVibratio"
+                    ? "AWD"
                 : "RWD"
         );
 
@@ -212,6 +215,23 @@ function drawCarBody(
     );
 
     ctx.fill();
+
+    const brakeDive =
+        Math.max(0, Math.min(car.brakeDive || 0, 1));
+
+    ctx.save();
+
+    if (brakeDive > 0) {
+        const bodyDiveAngle =
+            brakeDive * 0.055;
+
+        const rearWheel =
+            sprite.rearWheel;
+
+        ctx.translate(rearWheel.x, rearWheel.y);
+        ctx.rotate(bodyDiveAngle);
+        ctx.translate(-rearWheel.x, -rearWheel.y);
+    }
 
     // ===== BODY IMAGE + PAINT =====
     if (isImageReady(bodyImage)) {
@@ -388,6 +408,8 @@ function drawCarBody(
         }
     }
 
+    ctx.restore();
+
     // ===== RIMS =====
     const wheelSpin =
         car.pos * 4.45 +
@@ -402,10 +424,10 @@ function drawCarBody(
             : 0;
 
     const rearSpin =
-        wheelSpin + (drivetrain === "RWD" ? spinSlip : 0);
+        wheelSpin + (drivetrain === "RWD" || drivetrain === "AWD" ? spinSlip : 0);
 
     const frontSpin =
-        wheelSpin + 0.35 + (drivetrain === "FWD" ? spinSlip : 0);
+        wheelSpin + 0.35 + (drivetrain === "FWD" || drivetrain === "AWD" ? spinSlip : 0);
 
     const drivenBlur =
         car.wheelspin
@@ -418,7 +440,7 @@ function drawCarBody(
         sprite.rearWheel.x,
         sprite.rearWheel.y,
         rearSpin,
-        drivetrain === "RWD" ? drivenBlur : speedBlur,
+        drivetrain === "RWD" || drivetrain === "AWD" ? drivenBlur : speedBlur,
         sprite.rearWheel.rimScale || sprite.rearWheel.radius / 8
     );
 
@@ -428,7 +450,7 @@ function drawCarBody(
         sprite.frontWheel.x,
         sprite.frontWheel.y,
         frontSpin,
-        drivetrain === "FWD" ? drivenBlur : speedBlur,
+        drivetrain === "FWD" || drivetrain === "AWD" ? drivenBlur : speedBlur,
         sprite.frontWheel.rimScale || sprite.frontWheel.radius / 8
     );
 
@@ -617,6 +639,83 @@ function drawRoad(
     ctx.fillRect(0, 204, canvas.width, 2);
 }
 
+function drawCountdownLights(
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+) {
+    const showingLaunchGreen =
+        Game.raceStarted &&
+        Game.launchTriggered &&
+        Game.launchTimer > 0;
+
+    if (!Game.countdownActive && !showingLaunchGreen) return;
+
+    const centerX =
+        canvas.width / 2;
+
+    const y =
+        28;
+
+    const radius =
+        11;
+
+    const spacing =
+        32;
+
+    const lights = [
+        {
+            x: centerX - spacing,
+            color: "#ff3838",
+            active: Game.countdownActive && Game.countdownValue >= 3
+        },
+        {
+            x: centerX,
+            color: "#ffd23a",
+            active: Game.countdownActive && Game.countdownValue <= 2
+        },
+        {
+            x: centerX + spacing,
+            color: "#39ff57",
+            active: showingLaunchGreen
+        }
+    ];
+
+    ctx.save();
+    ctx.fillStyle = "rgba(8, 10, 14, 0.72)";
+    ctx.strokeStyle = "rgba(210, 220, 235, 0.38)";
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.roundRect(centerX - 64, y - 20, 128, 40, 9);
+    ctx.fill();
+    ctx.stroke();
+
+    for (const light of lights) {
+        ctx.beginPath();
+        ctx.fillStyle =
+            light.active
+                ? light.color
+                : "rgba(45, 49, 56, 0.95)";
+
+        ctx.shadowColor =
+            light.active
+                ? light.color
+                : "transparent";
+
+        ctx.shadowBlur =
+            light.active ? 14 : 0;
+
+        ctx.arc(light.x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
 export const Render = {
 
     drawCar(
@@ -677,6 +776,8 @@ export const Render = {
             direction,
             worldScale
         );
+
+        drawCountdownLights(ctx, canvas);
 
         // ===== LINE POSITIONING =====
         const lineOffset = 20;

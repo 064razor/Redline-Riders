@@ -5,13 +5,29 @@ export const UI = {
     shiftState: "off",
     shiftMessage: "",
     shiftTimer: 0,
+    shiftPromptKind: "",
     shiftLock: false,
 
     showCountdown(value: any) {
         const countdownEl = document.getElementById("countdown");
         if (countdownEl) {
-            countdownEl.innerText = value;
+            countdownEl.innerText = "";
         }
+
+        if (value === "" || value === null || value === undefined) {
+            if (this.shiftPromptKind === "countdown") {
+                this.clearShiftPrompt();
+            }
+
+            return;
+        }
+
+        this.showShiftPrompt(
+            String(value),
+            value === "GO!" ? "perfect" : "countdown",
+            0.82,
+            "countdown"
+        );
     },
 
     init() {},
@@ -86,9 +102,6 @@ export const UI = {
         (document.getElementById("buyTires") as HTMLButtonElement).innerText =
         "Buy Tires (+120 Grip) ($" + game.playerCar.tirePrice + ")";
 
-        (document.getElementById("buyEngine") as HTMLButtonElement).innerText =
-        "Buy Engine (+25 HP) ($" + game.playerCar.enginePrice + ")";
-		
 		(document.getElementById("buyTransmission") as HTMLButtonElement).innerText =
         "Transmission Upgrade (+Top Speed) ($" + game.playerCar.transmissionPrice + ")";
 			
@@ -106,34 +119,73 @@ export const UI = {
             }
     },
 
-    triggerShiftFeedback(state: any) {
+    clearShiftPrompt() {
+        this.shiftTimer = 0;
+        this.shiftPromptKind = "";
 
-    this.shiftState = state;
-    this.shiftTimer = 0.8;
-
-    const shiftMsg = document.getElementById("shiftMsg");
+        const shiftMsg = document.getElementById("shiftMsg");
 
         if (shiftMsg) {
+            shiftMsg.innerText = "";
+            shiftMsg.classList.remove("perfect", "good", "bad", "active", "countdown");
+        }
+    },
 
-        shiftMsg.innerText = state;
-        shiftMsg.classList.remove("perfect", "good", "bad", "active");
+    showShiftPrompt(message: string, tone: string, duration: number, kind: string) {
+        this.shiftState = tone;
+        this.shiftTimer = duration;
+        this.shiftPromptKind = kind;
+
+        const shiftMsg = document.getElementById("shiftMsg");
+
+        if (!shiftMsg) return;
+
+        shiftMsg.innerText = message;
+        shiftMsg.classList.remove("perfect", "good", "bad", "active", "countdown");
         shiftMsg.classList.add("active");
 
-        // Optional colors for readability
-        if (state === "PERFECT") {
+        if (tone === "perfect") {
             shiftMsg.style.color = "#33ff33";
             shiftMsg.classList.add("perfect");
         }
-        else if (state === "GOOD") {
+        else if (tone === "good") {
             shiftMsg.style.color = "#ffff33";
             shiftMsg.classList.add("good");
+        }
+        else if (tone === "countdown") {
+            shiftMsg.style.color = "#ffffff";
+            shiftMsg.classList.add("countdown");
         }
         else {
             shiftMsg.style.color = "#ff3333";
             shiftMsg.classList.add("bad");
         }
-    }
-},
+    },
+
+    triggerShiftFeedback(state: any) {
+        if (state === "PERFECT") {
+            this.showShiftPrompt(state, "perfect", 0.8, "shift");
+        }
+        else if (state === "GOOD") {
+            this.showShiftPrompt(state, "good", 0.8, "shift");
+        }
+        else {
+            this.showShiftPrompt(state, "bad", 0.8, "shift");
+        }
+    },
+
+    triggerLaunchFeedback(state: string) {
+        let tone = "bad";
+
+        if (state === "Perfect Launch") {
+            tone = "perfect";
+        }
+        else if (state === "Good Launch") {
+            tone = "good";
+        }
+
+        this.showShiftPrompt(state, tone, 1.45, "launch");
+    },
 
     drawTach(car: any, game: any) {
         const canvas = document.getElementById("tachCanvas") as HTMLCanvasElement;
@@ -185,20 +237,6 @@ export const UI = {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-		// ===== DRAW LAUNCH MESSAGE =====
-        if (game.launchTriggered) {
-
-             ctx.fillStyle = "#ffffff";
-             ctx.font = "bold 16px Arial";
-             ctx.textAlign = "center";
-
-             ctx.fillText(
-                 game.launchState,
-                 centerX,
-                 centerY - 25
-             );
-        }
-		
 		// ===== DRAW POWERBAND ZONES =====
         const shiftWindow =
             getShiftWindow(car);
@@ -325,8 +363,10 @@ if (car.maxRPM % 1000 !== 0) {
 
                 if (shiftMsg) {
                     shiftMsg.innerText = "";
-                    shiftMsg.classList.remove("perfect", "good", "bad", "active");
+                    shiftMsg.classList.remove("perfect", "good", "bad", "active", "countdown");
                 }
+
+                this.shiftPromptKind = "";
             }
         }
 		
@@ -491,10 +531,16 @@ if (car.maxRPM % 1000 !== 0) {
         );
 
         // ===== BOOST GAUGE =====
+        const hasBoostGauge =
+            car.forcedInductionType === "turbo" ||
+            car.forcedInductionType === "supercharger";
+
+        if (!hasBoostGauge) {
+            return;
+        }
+
         const boostPsi = Math.max(0, car.boostPsi || 0);
         const hasBoost =
-            (car.forcedInductionType === "turbo" ||
-            car.forcedInductionType === "supercharger") &&
             boostPsi > 0.05;
 
         const boostX = centerX + 112;
@@ -599,11 +645,19 @@ if (car.maxRPM % 1000 !== 0) {
     const aiTime = document.getElementById("summaryAiTime")!;
 	const reward = document.getElementById("summaryReward")!;
     const difference = document.getElementById("summaryDifference")!;
+    const raceAgainButton =
+        document.getElementById("raceAgainBtn") as HTMLButtonElement;
 	const playerWon =
-		game.raceReward === 100;
+        game.runMode === "event"
+            ? !!game.currentEventRoundWon
+            : game.raceReward === 100;
 		
-		summary.classList.remove("hidden");
+        summary.classList.remove("hidden");
         summary.style.display = "block";
+
+    if (raceAgainButton) {
+        raceAgainButton.innerText = "Race Again?";
+    }
 
     if (game.runMode === "practice" || game.runMode === "testDrive") {
         const runLabel =
@@ -639,16 +693,53 @@ if (car.maxRPM % 1000 !== 0) {
         return;
     }
 
-    title.innerText = playerWon ? "Victory!" : "Defeat";
+    if (game.runMode === "event") {
+        const event =
+            game.getActiveEvent ? game.getActiveEvent() : null;
+
+        const roundNumber =
+            (game.eventRoundIndex || 0) + 1;
+
+        const totalRounds =
+            event?.rounds?.length || roundNumber;
+
+        title.innerText =
+            playerWon
+                ? roundNumber >= totalRounds
+                    ? "Event Complete!"
+                    : "Event Round Won!"
+                : "Event Round Lost";
+
+        aiTime.innerText =
+            "Opponent: " +
+            (game.currentOpponentName || "Unknown") +
+            " | Time: " +
+            (
+                game.aiFinishTime > 0
+                    ? game.aiFinishTime.toFixed(2) + "s"
+                    : game.playerFinishTime > 0
+                        ? "Still racing"
+                        : "DNF"
+            );
+    }
+    else {
+        title.innerText = playerWon ? "Victory!" : "Defeat";
+
+        aiTime.innerText =
+            "Opponent Time: " +
+            (
+                game.aiFinishTime > 0
+                    ? game.aiFinishTime.toFixed(2) + "s"
+                    : game.playerFinishTime > 0
+                        ? "Still racing"
+                        : "DNF"
+            );
+    }
 
     playerTime.innerText =
         "Player Time: " +
         (game.playerFinishTime > 0 ? game.playerFinishTime.toFixed(2) + "s" : "DNF");
 
-    aiTime.innerText =
-        "Opponent Time: " +
-        (game.aiFinishTime > 0 ? game.aiFinishTime.toFixed(2) + "s" : "DNF");
-	
 			if (game.playerFinishTime > 0 && game.aiFinishTime > 0) {
 
 			const gap =
@@ -661,8 +752,13 @@ if (car.maxRPM % 1000 !== 0) {
 		}
 		else if (game.playerFinishTime > 0 && game.aiFinishTime <= 0) {
 
+            const liveLead =
+                Math.max(0, game.raceTime - game.playerFinishTime);
+
 			difference.innerText =
-				"Difference: Opponent still racing...";
+				liveLead > 0
+                    ? "Difference: Winning by at least " + liveLead.toFixed(2) + "s"
+                    : "Difference: Opponent still racing...";
 		}
 		else if (game.aiFinishTime > 0 && game.playerFinishTime <= 0) {
 
@@ -675,12 +771,39 @@ if (car.maxRPM % 1000 !== 0) {
 				"Difference: Waiting...";
 		}
 		
-    reward.innerText =
-    "Race Reward: +$" + game.raceReward + "\n" +
-    "Launch Bonus: +$" + game.bonusReward + "\n" +
-    "Difficulty Multiplier: x" + game.difficultyMultiplier + "\n" +
-    "Distance Multiplier: x" + game.distanceMultiplier + "\n" +
-    "Total Cash Earned: +$" + game.totalReward;
+    if (game.runMode === "event") {
+        const event =
+            game.getActiveEvent ? game.getActiveEvent() : null;
+
+        const roundNumber =
+            (game.eventRoundIndex || 0) + 1;
+
+        const totalRounds =
+            event?.rounds?.length || roundNumber;
+
+        reward.innerText =
+            "Event: " + (event?.name || "Event") + "\n" +
+            "Round: " + roundNumber + " / " + totalRounds + "\n" +
+            "Event Payout: +$" + game.totalReward + "\n" +
+            "Launch Bonus: held until event completion";
+
+        if (raceAgainButton) {
+            raceAgainButton.innerText =
+                playerWon && roundNumber < totalRounds
+                    ? "Next Race"
+                    : playerWon
+                        ? "Finish Event"
+                        : "Retry Race";
+        }
+    }
+    else {
+        reward.innerText =
+        "Race Reward: +$" + game.raceReward + "\n" +
+        "Launch Bonus: +$" + game.bonusReward + "\n" +
+        "Difficulty Multiplier: x" + game.difficultyMultiplier + "\n" +
+        "Distance Multiplier: x" + game.distanceMultiplier + "\n" +
+        "Total Cash Earned: +$" + game.totalReward;
+    }
 },
 
     drawExtras(car: any) {}

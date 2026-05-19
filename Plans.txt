@@ -1,0 +1,52 @@
+Visual:
++Modular body part compatibility
+
+Gameplay:
++Tournament events
++Rival opponents
+
+Balance:
+
+Gameplay loop:
++Early-game progression pass
+
+Fix:
+All clear!
+
+Under the hood:
+
+Far Future:
+(Tournament events and event page mus be completed first!)
++Per-save profile racer EXP
++Some upgrades need to be unlocked at a certain level
++Some cosmetics need to be upgraded at a certain level
++New cars unlock at certain levels
++New events unlock at certain levels
++0.2% boost to cash earned to base race reward per level
+
+
+Recently completed:
++Hints and tips in the menu
++321 beep/visual UI
++No boost meter for NA/NA+
++Launch messages moved to where shift messages are
++Real per-car torque curves
++Dynamic boost/PSI behavior for Turbo and Super
++Curve-based shift windows and AI shift behavior
++Upgrade stat feedback messages
++Save/load chime
++Boost gauge notches and repositioning
++Hanna Civilian stock balance pass
++Roulette Mont Blanc stock balance pass
++Practice gamemode
++Dealership Test Drive
++Dealership car icons/previews
++First UI visual polish pass
++Per-car drag coefficient
++7 new decals
++Visual power/torque graph in garage
++red, yellow green lights on race canvas during countdown.
++Tips and hints that cycle each time you view a new menu
++Car archetype helper, displays what archetype cars should play to in the code
++Stats tab that tracks wins, losses, most used car, total money earned, total money spent, total playtime
++Event menu shell with event cards and difficulty labels

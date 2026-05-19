@@ -67,6 +67,57 @@ export const Decals = {
             defaultColor: "#33e6ff"
         },
         {
+            id: "lightningBolt",
+            name: "Lightning Bolt",
+            imagePath: "./assets/decals/lightning-bolt.png",
+            colorable: true,
+            defaultColor: "#ffe04a"
+        },
+        {
+            id: "speedChevrons",
+            name: "Speed Chevrons",
+            imagePath: "./assets/decals/speed-chevrons.png",
+            colorable: true,
+            defaultColor: "#f5f5f5"
+        },
+        {
+            id: "risingSun",
+            name: "Rising Sun",
+            imagePath: "./assets/decals/rising-sun.png",
+            colorable: true,
+            defaultColor: "#ff3b35",
+            price: 110
+        },
+        {
+            id: "circuitTrace",
+            name: "Circuit Trace",
+            imagePath: "./assets/decals/circuit-trace.png",
+            colorable: true,
+            defaultColor: "#47f7d4"
+        },
+        {
+            id: "starTrail",
+            name: "Star Trail",
+            imagePath: "./assets/decals/star-trail.png",
+            colorable: true,
+            defaultColor: "#f5f5f5",
+            price: 110
+        },
+        {
+            id: "checkerStripe",
+            name: "Checker Stripe",
+            imagePath: "./assets/decals/checker-stripe.png",
+            colorable: true,
+            defaultColor: "#f5f5f5"
+        },
+        {
+            id: "driftScratch",
+            name: "Drift Scratch",
+            imagePath: "./assets/decals/drift-scratch.png",
+            colorable: true,
+            defaultColor: "#ff4a4a"
+        },
+        {
             id: "numberRoundel",
             name: "Number Roundel",
             imagePath: "./assets/decals/number-roundel.png",

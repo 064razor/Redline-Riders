@@ -1,14 +1,15 @@
 import { SaveSystem } from "./save.js";
 import { Menu } from "./menu.js";
 import { Shop } from "./shop.js";
-import { Garage, normalizeGripRating, migrateGarageGripRatings, migrateGarageTorqueCurves, migrateGarageBalanceDefaults, migrateGaragePowerAdderCurves } from "./garage.js";
+import { Garage, getDefaultTorqueCurve, normalizeGripRating, migrateGarageGripRatings, migrateGarageTorqueCurves, migrateGarageBalanceDefaults, migrateGaragePowerAdderCurves, migrateGarageDragCoefficients, migrateGarageArchetypes } from "./garage.js";
 import { UI } from "./ui.js";
 import { Render } from "./render.js";
 import { Physics } from "./physics.js";
 import { AudioSystem } from "./audio.js";
 import { Input } from "./input.js";
 import { Decals } from "./decals.js";
-import { getEstimatedPowerAtRpm, getShiftWindow } from "./power.js";
+import { getDisplacementTorqueCurve, getEstimatedPowerAtRpm, getShiftWindow } from "./power.js";
+import { Events } from "./events.js";
 
 function normalizeHexColor(hexColor: string) {
     const raw = hexColor.replace("#", "");
@@ -161,6 +162,8 @@ export const Game = {
     garageCars: {
         maruMk5: Garage.getMaruMk5(),
         swagGG2: Garage.getSwagGG2(),
+        swagLadybug2024: Garage.getSwagLadybug2024(),
+        scholarVibratio: Garage.getScholarVibratio(),
         rouletteBlair: Garage.getRouletteBlair(),
         rouletteMontBlanc: Garage.getRouletteMontBlanc(),
 		hannaCivilian: Garage.getHannaCivilian()
@@ -171,8 +174,15 @@ export const Game = {
     selectedOpponentBodyId: "maruMk5",
     randomOpponent: false,
     runMode: "race",
+    activeEventId: "",
+    eventRoundIndex: 0,
+    currentEventRoundWon: false,
+    completedEvents: {} as Record<string, number>,
+    currentOpponentName: "",
+    currentOpponentDifficulty: "",
     testDriveCar: null as any,
     preTestDriveCar: null as any,
+    preTestDriveCarId: "",
     runCarName: "",
     practiceBestTimes: {} as Record<string, number>,
     aiUnderglowChance: 0.15,
@@ -205,6 +215,16 @@ export const Game = {
     aiFinishTime: 0,
     totalReward: 0,
     raceSummaryVisible: false,
+    stats: {
+        wins: 0,
+        losses: 0,
+        totalMoneyEarned: 0,
+        totalMoneySpent: 0,
+        totalPlayTime: 0,
+        carUses: {} as Record<string, number>,
+        carWins: {} as Record<string, number>
+    },
+    statsSaveTimer: 0,
 
     aiLaunchRPM: 0,
     aiShiftPoint: 0,
@@ -220,12 +240,477 @@ export const Game = {
     opponentBodyIds: [
         "maruMk5",
         "swagGG2",
+        "swagLadybug2024",
+        "scholarVibratio",
         "rouletteBlair",
         "rouletteMontBlanc",
         "hannaCivilian"
     ],
 
     trackUnitsPerMile: 720,
+
+    getDefaultStats() {
+        return {
+            wins: 0,
+            losses: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            totalPlayTime: 0,
+            carUses: {} as Record<string, number>,
+            carWins: {} as Record<string, number>
+        };
+    },
+
+    getRandomEventRacerName() {
+        const adjectives = [
+            "Redline",
+            "Slipstream",
+            "Apex",
+            "Nitro",
+            "Throttle",
+            "Overdrive",
+            "Street",
+            "Gearbox"
+        ];
+
+        const titles = [
+            "Rookie",
+            "Runner",
+            "Cruiser",
+            "Shifter",
+            "Sprinter",
+            "Chaser",
+            "Pilot",
+            "Driver"
+        ];
+
+        const name =
+            adjectives[Math.floor(Math.random() * adjectives.length)] + " " +
+            titles[Math.floor(Math.random() * titles.length)];
+
+        return (
+            name === "Cruz" ||
+            name === "Rocket" ||
+            name === "Pinky" ||
+            name === "Little Kaizer" ||
+            name === "Codex" ||
+            name === "Archive" ||
+            name === "Matrix" ||
+            name === "Mako"
+        )
+            ? "Redline Rookie"
+            : name;
+    },
+
+    getActiveEvent() {
+        return this.activeEventId
+            ? Events.getById(this.activeEventId)
+            : null;
+    },
+
+    getActiveEventRound() {
+        const event =
+            this.getActiveEvent();
+
+        if (!event) return null;
+
+        return event.rounds[this.eventRoundIndex] || null;
+    },
+
+    getEventPayout(event: any) {
+        const completions =
+            this.completedEvents[event.id] || 0;
+
+        return completions > 0
+            ? event.replayPayout
+            : event.payout;
+    },
+
+    applyEventCarSetup(car: any, setup: any) {
+        if (!car || !setup) return;
+
+        if (setup.randomFullCustomization) {
+            this.applyRandomFullCustomization(car);
+        }
+
+        if (setup.paintColor) car.paintColor = setup.paintColor;
+        if (setup.rimStyle) car.rimStyle = setup.rimStyle;
+        if (setup.decalId) car.decalId = setup.decalId;
+        if (setup.decalColor) car.decalColor = setup.decalColor;
+        if (setup.underglowColor) car.underglowColor = setup.underglowColor;
+        if (setup.needleColor) car.needleColor = setup.needleColor;
+        if (setup.hubColor) car.hubColor = setup.hubColor;
+        if (setup.tachTextColor) car.tachTextColor = setup.tachTextColor;
+
+        if (setup.exhaustLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.exhaustLevel));
+
+            car.exhaustLevel =
+                (car.exhaustLevel || 0) + levels;
+
+            car.hp =
+                (car.hp || 0) + (8 * levels);
+        }
+
+        if (setup.ecuLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.ecuLevel));
+
+            car.ecuLevel =
+                (car.ecuLevel || 0) + levels;
+
+            car.hp =
+                (car.hp || 0) + (5 * levels);
+
+            car.maxRPM =
+                (car.maxRPM || 0) + (55 * levels);
+
+            car.powerbandMax =
+                (car.powerbandMax || 0) + (55 * levels);
+        }
+
+        if (setup.crankLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.crankLevel));
+
+            car.crankLevel =
+                (car.crankLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (6 * levels);
+            car.torque =
+                (car.torque || 0) + (12 * levels);
+        }
+
+        if (setup.turboLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.turboLevel));
+
+            car.forcedInductionType = "turbo";
+            car.turboLevel =
+                (car.turboLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (10 * levels);
+            car.torque =
+                (car.torque || 0) + (2 * levels);
+            car.powerbandMax =
+                (car.powerbandMax || 0) + (70 * levels);
+            car.turboSpool = 0;
+        }
+
+        if (setup.superchargerLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.superchargerLevel));
+
+            car.forcedInductionType = "supercharger";
+            car.superchargerLevel =
+                (car.superchargerLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (5 * levels);
+            car.torque =
+                (car.torque || 0) + (10 * levels);
+            car.powerbandMin =
+                Math.max(1000, (car.powerbandMin || 3000) - (45 * levels));
+        }
+
+        if (setup.displacementLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.displacementLevel));
+
+            car.forcedInductionType = "displacement";
+            car.displacementLevel =
+                (car.displacementLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (10 * levels);
+            car.torque =
+                (car.torque || 0) + (18 * levels);
+            car.powerbandMin =
+                Math.max(1000, (car.powerbandMin || 3000) - (80 * levels));
+            car.powerbandMax =
+                Math.max(car.powerbandMin + 900, (car.powerbandMax || 5500) - (35 * levels));
+
+            const baseCurve =
+                car.baseTorqueCurve ||
+                getDefaultTorqueCurve(car.bodyId);
+
+            car.baseTorqueCurve =
+                baseCurve;
+
+            car.torqueCurve =
+                getDisplacementTorqueCurve(
+                    baseCurve,
+                    car.displacementLevel || 0
+                );
+        }
+
+        if (setup.tireLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.tireLevel));
+
+            car.tireLevel =
+                (car.tireLevel || 0) + levels;
+
+            car.grip =
+                (car.grip || 0) + (120 * levels);
+        }
+
+        if (setup.weightReductionLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.weightReductionLevel));
+
+            car.weightReductionLevel =
+                (car.weightReductionLevel || 0) + levels;
+
+            const baseWeight =
+                car.baseWeight ?? car.weight;
+
+            car.baseWeight =
+                baseWeight;
+
+            const minimumAllowedWeight =
+                Math.max(1200, baseWeight * 0.55);
+
+            car.weight =
+                Math.max(
+                    minimumAllowedWeight,
+                    (car.weight || baseWeight) - (120 * levels)
+                );
+        }
+
+        if (setup.suspensionLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.suspensionLevel));
+
+            car.suspensionLevel =
+                (car.suspensionLevel || 0) + levels;
+
+            car.grip =
+                (car.grip || 0) + (10 * levels);
+        }
+
+        if (setup.aeroLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.aeroLevel));
+
+            car.aeroLevel =
+                (car.aeroLevel || 0) + levels;
+
+            const currentDrag =
+                Number.isFinite(car.dragCoefficient)
+                    ? car.dragCoefficient
+                    : 0.34;
+
+            car.dragCoefficient =
+                Math.max(0.24, Number((currentDrag - (0.005 * levels)).toFixed(3)));
+        }
+
+        if (setup.intakeLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.intakeLevel));
+
+            car.intakeLevel =
+                (car.intakeLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (7 * levels);
+            car.torque =
+                (car.torque || 0) + (4 * levels);
+        }
+
+        if (setup.topEndLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.topEndLevel));
+
+            car.topEndLevel =
+                (car.topEndLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (14 * levels);
+            car.maxRPM =
+                (car.maxRPM || 0) + (90 * levels);
+            car.powerbandMax =
+                (car.powerbandMax || 0) + (90 * levels);
+        }
+
+        if (setup.bottomEndLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.bottomEndLevel));
+
+            car.bottomEndLevel =
+                (car.bottomEndLevel || 0) + levels;
+            car.hp =
+                (car.hp || 0) + (8 * levels);
+            car.torque =
+                (car.torque || 0) + (16 * levels);
+        }
+
+        if (setup.transmissionLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.transmissionLevel));
+
+            car.transmissionLevel =
+                (car.transmissionLevel || 0) + levels;
+            car.topSpeed =
+                (car.topSpeed || 0) + (10 * levels);
+
+            if (Array.isArray(car.gearMaxSpeeds)) {
+                car.gearMaxSpeeds =
+                    car.gearMaxSpeeds.map((speed: number) => speed + (10 * levels));
+            }
+        }
+
+        if (setup.flywheelLevel) {
+            const levels =
+                Math.max(0, Math.floor(setup.flywheelLevel));
+
+            car.flywheelLevel =
+                (car.flywheelLevel || 0) + levels;
+
+            car.shiftSpeed =
+                Math.max(0.12, (car.shiftSpeed || 0.3) - (0.02 * levels));
+        }
+    },
+
+    applyRandomFullCustomization(car: any) {
+        const colors = [
+            "#ff3355",
+            "#38d9ff",
+            "#ffe34a",
+            "#76ff4f",
+            "#b96dff",
+            "#ff8a2a",
+            "#f7f7f7",
+            "#151515"
+        ];
+
+        const rimStyles = [
+            "classic5",
+            "split6",
+            "mesh",
+            "deepDish",
+            "star",
+            "hyper5",
+            "cyclone",
+            "haloWire",
+            "bladeSix",
+            "blockEight"
+        ];
+
+        const decals =
+            Decals.options.filter(decal => decal.id !== "none");
+
+        const randomColor = () =>
+            colors[Math.floor(Math.random() * colors.length)];
+
+        const decal =
+            decals[Math.floor(Math.random() * decals.length)];
+
+        car.paintColor = randomColor();
+        car.rimStyle =
+            rimStyles[Math.floor(Math.random() * rimStyles.length)];
+        car.underglowColor = randomColor();
+        car.needleColor = randomColor();
+        car.hubColor = randomColor();
+        car.tachTextColor = randomColor();
+        car.decalId = decal.id;
+        car.decalColor =
+            decal.colorable
+                ? randomColor()
+                : decal.defaultColor || "#ffffff";
+    },
+
+    normalizeStats(stats: any) {
+        const defaults =
+            this.getDefaultStats();
+
+        return {
+            wins: Number(stats?.wins ?? defaults.wins),
+            losses: Number(stats?.losses ?? defaults.losses),
+            totalMoneyEarned: Number(stats?.totalMoneyEarned ?? defaults.totalMoneyEarned),
+            totalMoneySpent: Number(stats?.totalMoneySpent ?? defaults.totalMoneySpent),
+            totalPlayTime: Number(stats?.totalPlayTime ?? defaults.totalPlayTime),
+            carUses: stats?.carUses && typeof stats.carUses === "object"
+                ? stats.carUses
+                : {},
+            carWins: stats?.carWins && typeof stats.carWins === "object"
+                ? stats.carWins
+                : {}
+        };
+    },
+
+    recordMoneySpent(amount: number) {
+        if (!Number.isFinite(amount) || amount <= 0) return;
+        this.stats = this.normalizeStats(this.stats);
+        this.stats.totalMoneySpent += amount;
+    },
+
+    recordMoneyEarned(amount: number) {
+        if (!Number.isFinite(amount) || amount <= 0) return;
+        this.stats = this.normalizeStats(this.stats);
+        this.stats.totalMoneyEarned += amount;
+    },
+
+    recordRaceResult(playerWon: boolean) {
+        this.stats = this.normalizeStats(this.stats);
+
+        if (playerWon) {
+            this.stats.wins++;
+
+            const carId =
+                this.playerCar?.bodyId || "";
+
+            if (carId) {
+                this.stats.carWins[carId] =
+                    (this.stats.carWins[carId] || 0) + 1;
+            }
+        }
+        else {
+            this.stats.losses++;
+        }
+    },
+
+    recordCarUse(car: any) {
+        if (!car?.bodyId) return;
+        this.stats = this.normalizeStats(this.stats);
+        this.stats.carUses[car.bodyId] =
+            (this.stats.carUses[car.bodyId] || 0) + 1;
+    },
+
+    getMostUsedCarId() {
+        this.stats = this.normalizeStats(this.stats);
+
+        let bestId = "";
+        let bestCount = 0;
+
+        for (const carId of Object.keys(this.stats.carUses)) {
+            const count =
+                this.stats.carUses[carId] || 0;
+
+            if (count > bestCount) {
+                bestId = carId;
+                bestCount = count;
+            }
+        }
+
+        return bestId;
+    },
+
+    getMostSuccessfulCarId() {
+        this.stats = this.normalizeStats(this.stats);
+
+        let bestId = "";
+        let bestCount = 0;
+
+        for (const carId of Object.keys(this.stats.carWins)) {
+            const count =
+                this.stats.carWins[carId] || 0;
+
+            if (count > bestCount) {
+                bestId = carId;
+                bestCount = count;
+            }
+        }
+
+        return bestId;
+    },
 
     getSelectedTrackLength() {
         const trackSelect =
@@ -256,6 +741,14 @@ export const Game = {
             return Garage.getSwagGG2();
         }
 
+        if (bodyId === "swagLadybug2024") {
+            return Garage.getSwagLadybug2024();
+        }
+
+        if (bodyId === "scholarVibratio") {
+            return Garage.getScholarVibratio();
+        }
+
         if (bodyId === "rouletteBlair") {
             return Garage.getRouletteBlair();
         }
@@ -271,24 +764,86 @@ export const Game = {
         return Garage.getMaruMk5();
     },
 
-    getPerformanceScore(car: any) {
+    getTrackPerformanceWeights(trackLength: number = this.trackLength) {
+        const lengthRatio =
+            Math.max(
+                0,
+                Math.min(
+                    trackLength / this.trackUnitsPerMile,
+                    1.5
+                )
+            );
+
+        const sprintBias =
+            Math.max(0, Math.min(1 - lengthRatio * 2.4, 1));
+
+        const longBias =
+            Math.max(0, Math.min((lengthRatio - 0.25) / 0.75, 1));
+
+        return {
+            power: 690 + longBias * 190,
+            torque: 720 - longBias * 180 + sprintBias * 80,
+            grip: 24 - longBias * 7 + sprintBias * 6,
+            topSpeed: 10 + longBias * 34,
+            drag: 4 + longBias * 18,
+            shiftSpeed: 12 - longBias * 5 + sprintBias * 5
+        };
+    },
+
+    getPerformanceScore(car: any, trackLength: number = this.trackLength) {
         if (!car) return 1;
 
         const weight =
             Math.max(car.weight || 2500, 1);
 
         let peakEstimatedPower = 1;
+        let usableEstimatedPower = 0;
+        let powerSamples = 0;
 
         for (let rpm = 1000; rpm <= (car.maxRPM || 7000); rpm += 250) {
+            const estimatedPower =
+                getEstimatedPowerAtRpm(car, rpm);
+
             peakEstimatedPower =
                 Math.max(
                     peakEstimatedPower,
-                    getEstimatedPowerAtRpm(car, rpm)
+                    estimatedPower
                 );
+
+            const rpmRatio =
+                rpm / Math.max(car.maxRPM || 7000, 1000);
+
+            if (rpmRatio >= 0.32) {
+                usableEstimatedPower += estimatedPower;
+                powerSamples++;
+            }
         }
 
+        const averageUsablePower =
+            powerSamples > 0
+                ? usableEstimatedPower / powerSamples
+                : peakEstimatedPower;
+
+        const lengthRatio =
+            Math.max(0, Math.min(trackLength / this.trackUnitsPerMile, 1.5));
+
+        const longBias =
+            Math.max(0, Math.min((lengthRatio - 0.25) / 0.75, 1));
+
+        const inductionType =
+            car.forcedInductionType || "none";
+
+        const peakShare =
+            inductionType === "turbo"
+                ? 0.32 + longBias * 0.16
+                : 0.46 + longBias * 0.12;
+
+        const scoredPower =
+            averageUsablePower * (1 - peakShare) +
+            peakEstimatedPower * peakShare;
+
         const powerToWeight =
-            peakEstimatedPower / weight;
+            scoredPower / weight;
 
         const torqueToWeight =
             (car.torque || 1) / weight;
@@ -299,19 +854,191 @@ export const Game = {
         const topSpeed =
             (car.topSpeed || 120) / 200;
 
+        const dragCoefficient =
+            Math.max(0.24, Math.min(car.dragCoefficient || 0.34, 0.62));
+
+        const aerodynamicScore =
+            Math.max(0.72, Math.min(0.34 / dragCoefficient, 1.32));
+
         const shiftSpeed =
             Math.max(car.shiftSpeed || 0.5, 0.08);
 
         const shiftSpeedScore =
             Math.max(0.75, Math.min(0.5 / shiftSpeed, 1.5));
 
+        const weights =
+            this.getTrackPerformanceWeights(trackLength);
+
         return (
-            powerToWeight * 760 +
-            torqueToWeight * 620 +
-            grip * 18 +
-            topSpeed * 20 +
-            shiftSpeedScore * 8
+            powerToWeight * weights.power +
+            torqueToWeight * weights.torque +
+            grip * weights.grip +
+            topSpeed * weights.topSpeed +
+            aerodynamicScore * weights.drag +
+            shiftSpeedScore * weights.shiftSpeed
         );
+    },
+
+    getAllowedOpponentTopSpeedRatio(difficulty: string) {
+        const lengthRatio =
+            Math.max(
+                0,
+                Math.min(this.trackLength / this.trackUnitsPerMile, 1.5)
+            );
+
+        const longBias =
+            Math.max(0, Math.min((lengthRatio - 0.25) / 0.75, 1));
+
+        let baseRatio = 1.08;
+
+        if (difficulty === "veryEasy") baseRatio = 0.98;
+        else if (difficulty === "easy") baseRatio = 1.03;
+        else if (difficulty === "hard") baseRatio = 1.14;
+        else if (difficulty === "veryHard") baseRatio = 1.22;
+
+        return baseRatio + longBias * 0.10;
+    },
+
+    limitOpponentTopSpeedForTrack(difficulty: string) {
+        if (!this.playerCar || !this.aiCar) return;
+
+        const playerTopSpeed =
+            Math.max(this.playerCar.topSpeed || 100, 40);
+
+        const maxOpponentTopSpeed =
+            Math.max(
+                70,
+                Math.round(
+                    playerTopSpeed *
+                    this.getAllowedOpponentTopSpeedRatio(difficulty)
+                )
+            );
+
+        if ((this.aiCar.topSpeed || 0) <= maxOpponentTopSpeed) return;
+
+        const topSpeedRatio =
+            maxOpponentTopSpeed / Math.max(this.aiCar.topSpeed || 1, 1);
+
+        this.aiCar.topSpeed =
+            maxOpponentTopSpeed;
+
+        if (Array.isArray(this.aiCar.gearMaxSpeeds)) {
+            this.aiCar.gearMaxSpeeds =
+                this.aiCar.gearMaxSpeeds.map((speed: number) =>
+                    Math.max(20, Math.round(speed * topSpeedRatio))
+                );
+        }
+    },
+
+    getOpponentTransmissionFloorRatio(difficulty: string) {
+        const lengthRatio =
+            Math.max(
+                0,
+                Math.min(this.trackLength / this.trackUnitsPerMile, 1.5)
+            );
+
+        const longBias =
+            Math.max(0, Math.min((lengthRatio - 0.25) / 0.75, 1));
+
+        let baseRatio = 0.84;
+
+        if (difficulty === "veryEasy") baseRatio = 0.72;
+        else if (difficulty === "easy") baseRatio = 0.78;
+        else if (difficulty === "hard") baseRatio = 0.88;
+        else if (difficulty === "veryHard") baseRatio = 0.93;
+
+        return baseRatio + longBias * 0.08;
+    },
+
+    getOpponentTransmissionUpgradeLimit(difficulty: string) {
+        const lengthRatio =
+            Math.max(
+                0,
+                Math.min(this.trackLength / this.trackUnitsPerMile, 1.5)
+            );
+
+        const longBias =
+            Math.max(0, Math.min((lengthRatio - 0.25) / 0.75, 1));
+
+        let baseLimit = 3;
+
+        if (difficulty === "veryEasy") baseLimit = 1;
+        else if (difficulty === "easy") baseLimit = 2;
+        else if (difficulty === "hard") baseLimit = 4;
+        else if (difficulty === "veryHard") baseLimit = 5;
+
+        return Math.max(0, Math.round(baseLimit * longBias));
+    },
+
+    applyOpponentTransmissionForTrack(difficulty: string) {
+        if (!this.playerCar || !this.aiCar) return;
+
+        const lengthRatio =
+            Math.max(
+                0,
+                Math.min(this.trackLength / this.trackUnitsPerMile, 1.5)
+            );
+
+        if (lengthRatio <= 0.25) return;
+
+        const playerTopSpeed =
+            Math.max(this.playerCar.topSpeed || 100, 40);
+
+        const currentTopSpeed =
+            Math.max(this.aiCar.topSpeed || 0, 0);
+
+        const floorTopSpeed =
+            Math.round(
+                playerTopSpeed *
+                this.getOpponentTransmissionFloorRatio(difficulty)
+            );
+
+        if (currentTopSpeed >= floorTopSpeed) return;
+
+        const upgradeLimit =
+            this.getOpponentTransmissionUpgradeLimit(difficulty);
+
+        if (upgradeLimit <= 0) return;
+
+        const neededUpgrades =
+            Math.ceil((floorTopSpeed - currentTopSpeed) / 10);
+
+        const appliedUpgrades =
+            Math.max(0, Math.min(neededUpgrades, upgradeLimit));
+
+        if (appliedUpgrades <= 0) return;
+
+        const oldTopSpeed =
+            currentTopSpeed;
+
+        this.aiCar.topSpeed =
+            Math.max(
+                70,
+                Math.min(
+                    floorTopSpeed,
+                    currentTopSpeed + appliedUpgrades * 10
+                )
+            );
+
+        const topSpeedRatio =
+            this.aiCar.topSpeed / Math.max(oldTopSpeed, 1);
+
+        if (Array.isArray(this.aiCar.gearMaxSpeeds)) {
+            this.aiCar.gearMaxSpeeds =
+                this.aiCar.gearMaxSpeeds.map((speed: number, index: number) => {
+                    const scaledSpeed =
+                        Math.round(speed * topSpeedRatio);
+
+                    if (index === this.aiCar.gearMaxSpeeds.length - 1) {
+                        return this.aiCar.topSpeed;
+                    }
+
+                    return Math.max(20, scaledSpeed);
+                });
+        }
+
+        this.aiCar.transmissionLevel =
+            (this.aiCar.transmissionLevel || 0) + appliedUpgrades;
     },
 
     getDifficultyPerformanceRatio(difficulty: string) {
@@ -320,17 +1047,17 @@ export const Game = {
         if (difficulty === "hard") return 1.02;
         if (difficulty === "veryHard") return 1.2;
 
-        return 1;
+        return 0.96;
     },
 
     scaleOpponentToPlayer(difficulty: string) {
         if (!this.playerCar || !this.aiCar) return;
 
         const playerScore =
-            this.getPerformanceScore(this.playerCar);
+            this.getPerformanceScore(this.playerCar, this.trackLength);
 
         const aiScore =
-            this.getPerformanceScore(this.aiCar);
+            this.getPerformanceScore(this.aiCar, this.trackLength);
 
         const targetScore =
             playerScore * this.getDifficultyPerformanceRatio(difficulty);
@@ -368,6 +1095,9 @@ export const Game = {
 
         this.aiCar.aiPerformanceScale =
             statScale;
+
+        this.applyOpponentTransmissionForTrack(difficulty);
+        this.limitOpponentTopSpeedForTrack(difficulty);
     },
 
     loadSaveIfNeeded() {
@@ -378,6 +1108,8 @@ export const Game = {
         const defaultGarageCars = {
             maruMk5: Garage.getMaruMk5(),
             swagGG2: Garage.getSwagGG2(),
+            swagLadybug2024: Garage.getSwagLadybug2024(),
+            scholarVibratio: Garage.getScholarVibratio(),
             rouletteBlair: Garage.getRouletteBlair(),
             rouletteMontBlanc: Garage.getRouletteMontBlanc(),
             hannaCivilian: Garage.getHannaCivilian()
@@ -396,6 +1128,12 @@ export const Game = {
             migrateGarageTorqueCurves(this.garageCars);
             migrateGarageBalanceDefaults(this.garageCars);
             migrateGaragePowerAdderCurves(this.garageCars);
+            migrateGarageDragCoefficients(this.garageCars);
+            migrateGarageArchetypes(this.garageCars);
+            this.stats =
+                this.normalizeStats(save.stats);
+            this.completedEvents =
+                save.completedEvents || {};
 
             this.playerCar =
                 this.garageCars[save.selectedCarId] ||
@@ -404,6 +1142,8 @@ export const Game = {
         else {
             this.garageCars = defaultGarageCars;
             this.playerCar = this.garageCars.maruMk5;
+            this.stats =
+                this.normalizeStats(this.stats);
         }
     },
 
@@ -413,10 +1153,18 @@ export const Game = {
         this.loadSaveIfNeeded();
         this.runMode = mode;
         this.testDriveCar = testDriveCar || null;
-        this.preTestDriveCar =
-            this.runMode === "testDrive"
-                ? this.preTestDriveCar || this.playerCar
-                : null;
+        if (this.runMode === "testDrive") {
+            this.preTestDriveCar =
+                this.preTestDriveCar || this.playerCar;
+            this.preTestDriveCarId =
+                this.preTestDriveCarId ||
+                this.playerCar?.bodyId ||
+                "";
+        }
+        else {
+            this.preTestDriveCar = null;
+            this.preTestDriveCarId = "";
+        }
 
         this.raceTime = 0;
         this.playerFinishTime = 0;
@@ -429,7 +1177,14 @@ export const Game = {
 
         Menu.hideAll();
 
-        this.trackLength = this.getSelectedTrackLength();
+        const activeEvent =
+            this.runMode === "event"
+                ? this.getActiveEvent()
+                : null;
+
+        this.trackLength =
+            activeEvent?.trackLength ||
+            this.getSelectedTrackLength();
 
         if (this.trackLength <= this.trackUnitsPerMile / 8) {
             this.distanceMultiplier = 1;
@@ -458,11 +1213,23 @@ export const Game = {
         this.runCarName =
             this.playerCar?.name || "";
 
+        if (this.runMode !== "testDrive") {
+            this.recordCarUse(this.playerCar);
+        }
+
+        const eventRound =
+            this.runMode === "event"
+                ? this.getActiveEventRound()
+                : null;
+
         const hasOpponent =
-            this.runMode === "race";
+            this.runMode === "race" ||
+            this.runMode === "event";
 
         const opponentBodyId =
-            this.randomOpponent
+            eventRound
+                ? eventRound.opponentBodyId
+                : this.randomOpponent
                 ? this.opponentBodyIds[
                     Math.floor(Math.random() * this.opponentBodyIds.length)
                 ]
@@ -473,15 +1240,31 @@ export const Game = {
                 ? this.createOpponentCar(opponentBodyId)
                 : null;
 
+        if (this.aiCar && eventRound) {
+            this.applyEventCarSetup(this.aiCar, eventRound.carSetup);
+            this.currentOpponentName =
+                eventRound.racerName || this.getRandomEventRacerName();
+            this.currentOpponentDifficulty =
+                eventRound.aiDifficulty;
+        }
+        else {
+            this.currentOpponentName = "";
+            this.currentOpponentDifficulty = "";
+        }
+
         const aiRimStyles = [
             "classic5",
             "split6",
             "mesh",
             "deepDish",
-            "star"
+            "star",
+            "cyclone",
+            "haloWire",
+            "bladeSix",
+            "blockEight"
         ];
 
-        if (this.aiCar) {
+        if (this.aiCar && !eventRound) {
             this.aiCar.rimStyle =
                 aiRimStyles[Math.floor(Math.random() * aiRimStyles.length)];
         }
@@ -496,7 +1279,7 @@ export const Game = {
             "#ffff1c", "#beff8c", "#beef"
         ];
 
-        if (this.aiCar) {
+        if (this.aiCar && !eventRound) {
             this.aiCar.paintColor =
                 aiColors[Math.floor(Math.random() * aiColors.length)];
 
@@ -519,7 +1302,7 @@ export const Game = {
                 ? aiDecals[Math.floor(Math.random() * aiDecals.length)]
                 : Decals.get("none");
 
-        if (this.aiCar) {
+        if (this.aiCar && !eventRound) {
             this.aiCar.decalId = aiDecal.id;
             this.aiCar.decalColor =
                 aiDecal.colorable
@@ -537,6 +1320,9 @@ export const Game = {
         this.playerCar.shiftRPMDrop = false;
         this.playerCar.shiftJoltTimer = 0;
         this.playerCar.shiftJoltStrength = 0;
+        this.playerCar.boostPsi = 0;
+        this.playerCar.turboSpool = 0;
+        this.playerCar.brakeDive = 0;
 
         if (this.aiCar) {
             this.aiCar.spd = 0;
@@ -547,6 +1333,9 @@ export const Game = {
             this.aiCar.shiftRPMDrop = false;
             this.aiCar.shiftJoltTimer = 0;
             this.aiCar.shiftJoltStrength = 0;
+            this.aiCar.boostPsi = 0;
+            this.aiCar.turboSpool = 0;
+            this.aiCar.brakeDive = 0;
         }
 
         this.raceStarted = false;
@@ -562,7 +1351,10 @@ export const Game = {
         const difficultySelect =
             document.getElementById("difficultySelect") as HTMLSelectElement;
 
-        const difficulty = difficultySelect.value;
+        const difficulty =
+            eventRound
+                ? eventRound.aiDifficulty
+                : difficultySelect.value;
 
         this.difficultyMultiplier = 1.25;
 
@@ -582,7 +1374,7 @@ export const Game = {
             this.difficultyMultiplier = 1.9;
         }
 
-        if (this.aiCar) {
+        if (this.aiCar && !eventRound) {
             this.scaleOpponentToPlayer(difficulty);
         }
 
@@ -618,11 +1410,11 @@ export const Game = {
             this.aiShiftDelay = 0.34;
         }
         else if (this.aiCar) {
-            this.aiLaunchRPM = aiShiftWindow.goodStart + 300;
-            this.aiShiftPoint = aiShiftWindow.recommendedShiftRPM * 0.96;
-            this.aiShiftPointScale = 0.96;
-            this.aiShiftBonus = 1.04;
-            this.aiShiftDelay = 0.53;
+            this.aiLaunchRPM = aiShiftWindow.goodStart + 120;
+            this.aiShiftPoint = aiShiftWindow.recommendedShiftRPM * 0.94;
+            this.aiShiftPointScale = 0.94;
+            this.aiShiftBonus = 1.00;
+            this.aiShiftDelay = 0.60;
         }
 
         if (this.aiCar) {
@@ -635,10 +1427,63 @@ export const Game = {
             this.aiCar.rpm = this.aiLaunchRPM;
         }
 
+        if (eventRound) {
+            const event =
+                this.getActiveEvent();
+
+            this.raceMessage =
+                `${event?.name || "Event"} ${this.eventRoundIndex + 1}/${event?.rounds.length || 1}: ` +
+                `${this.currentOpponentName} in ${this.aiCar?.name || "Unknown"}`;
+        }
+
         UI.showCountdown(this.countdownValue);
+        AudioSystem.playCountdownBeep(false);
 
         this.loop();
         this.runCountdown();
+    },
+
+    startEvent(eventId: string) {
+        const event =
+            Events.getById(eventId);
+
+        if (!event) {
+            this.raceMessage = "Event missing.";
+            this.raceMessageTimer = 2;
+            return;
+        }
+
+        this.activeEventId = event.id;
+        this.eventRoundIndex = 0;
+        this.currentEventRoundWon = false;
+        this.start("event");
+    },
+
+    continueEvent() {
+        const event =
+            this.getActiveEvent();
+
+        if (!event) return;
+
+        if (!this.currentEventRoundWon) {
+            this.start("event");
+            return;
+        }
+
+        this.eventRoundIndex++;
+        this.currentEventRoundWon = false;
+
+        if (this.eventRoundIndex >= event.rounds.length) {
+            this.activeEventId = "";
+            this.eventRoundIndex = 0;
+            Menu.showPanel("eventPanel");
+            if ((window as any).syncEventUI) {
+                (window as any).syncEventUI();
+            }
+            return;
+        }
+
+        this.start("event");
     },
 
     runCountdown() {
@@ -647,11 +1492,13 @@ export const Game = {
 
             if (this.countdownValue > 0) {
                 UI.showCountdown(this.countdownValue);
+                AudioSystem.playCountdownBeep(false);
                 return;
             }
 
             clearInterval(interval);
             UI.showCountdown("GO!");
+            AudioSystem.playCountdownBeep(true);
 
             this.countdownActive = false;
 
@@ -690,6 +1537,7 @@ export const Game = {
             this.launchTriggered = true;
             this.launchTimer = 1.5;
             this.raceStarted = true;
+            UI.triggerLaunchFeedback(this.launchState);
         }, 1000);
     },
 
@@ -733,7 +1581,21 @@ export const Game = {
     },
 
     updateFinishedCoast(car: any, dt: number) {
-        if (!car || car.spd <= 0) return;
+        if (!car) return;
+
+        if (car.spd <= 0) {
+            car.brakeDive =
+                (car.brakeDive || 0) * Math.max(0, 1 - dt * 2.2);
+
+            if (car.brakeDive < 0.01) {
+                car.brakeDive = 0;
+            }
+
+            return;
+        }
+
+        const speedBeforeBrake =
+            car.spd;
 
         const weightFactor =
             Math.max(
@@ -754,10 +1616,38 @@ export const Game = {
             car.spd = 0;
         }
 
+        const decelStep =
+            Math.max(0, speedBeforeBrake - car.spd);
+
+        const diveFromMomentum =
+            speedBeforeBrake * 0.018;
+
+        const diveFromBrakeForce =
+            decelStep * 5.5;
+
+        const targetDive =
+            car.spd > 0
+                ? Math.min(1, diveFromMomentum + diveFromBrakeForce)
+                : 0;
+
+        const settleRate =
+            targetDive > (car.brakeDive || 0) ? 4.5 : 3.8;
+
+        car.brakeDive =
+            (car.brakeDive || 0) +
+            (targetDive - (car.brakeDive || 0)) *
+            Math.min(1, dt * settleRate);
+
+        if (car.brakeDive < 0.01) {
+            car.brakeDive = 0;
+        }
+
         car.pos +=
             car.spd * dt;
     },
     awardRace(playerWon: boolean) {
+        if (this.raceSummaryVisible) return;
+
         if (this.runMode === "practice" || this.runMode === "testDrive") {
             const runLabel =
                 this.runMode === "testDrive"
@@ -787,6 +1677,47 @@ export const Game = {
             return;
         }
 
+        if (this.runMode === "event") {
+            const event =
+                this.getActiveEvent();
+
+            const eventComplete =
+                !!event &&
+                playerWon &&
+                this.eventRoundIndex >= event.rounds.length - 1;
+
+            this.currentEventRoundWon = playerWon;
+            this.raceReward =
+                eventComplete && event
+                    ? this.getEventPayout(event)
+                    : 0;
+
+            this.totalReward =
+                this.raceReward;
+
+            if (eventComplete && event) {
+                this.money += this.totalReward;
+                this.recordMoneyEarned(this.totalReward);
+                this.completedEvents[event.id] =
+                    (this.completedEvents[event.id] || 0) + 1;
+            }
+
+            this.recordRaceResult(playerWon);
+
+            this.raceMessage =
+                playerWon
+                    ? eventComplete
+                        ? "Event complete! +$" + this.totalReward
+                        : "Event round won!"
+                    : "Event round lost.";
+
+            this.raceMessageTimer = 3;
+            this.raceSummaryVisible = true;
+
+            SaveSystem.save(this);
+            return;
+        }
+
         this.raceReward = playerWon ? 100 : 25;
 
         this.totalReward = Math.floor(
@@ -796,6 +1727,8 @@ export const Game = {
         );
 
         this.money += this.totalReward;
+        this.recordMoneyEarned(this.totalReward);
+        this.recordRaceResult(playerWon);
 
         this.raceMessage =
             playerWon
@@ -814,6 +1747,15 @@ export const Game = {
 
         const update = () => {
             const dt = 0.016;
+
+            this.stats = this.normalizeStats(this.stats);
+            this.stats.totalPlayTime += dt;
+            this.statsSaveTimer += dt;
+
+            if (this.statsSaveTimer >= 30) {
+                this.statsSaveTimer = 0;
+                SaveSystem.save(this);
+            }
 
             this.updateShiftJolt(this.playerCar, dt);
             this.updateShiftJolt(this.aiCar, dt);
@@ -874,9 +1816,19 @@ export const Game = {
                     this.playerFinished = true;
                     this.playerFinishTime = this.raceTime;
 
-                    if (!this.aiCar && !this.raceSummaryVisible) {
-                        this.awardRace(true);
-                    }
+                    const playerWon =
+                        !this.aiCar ||
+                        !this.aiFinished ||
+                        (
+                            this.aiFinishTime > 0 &&
+                            this.playerFinishTime <= this.aiFinishTime
+                        );
+
+                    this.awardRace(playerWon);
+                    this.raceFinished = true;
+                    this.raceStarted = false;
+
+                    AudioSystem.stopEngine();
                 }
 
                 if (
@@ -888,35 +1840,25 @@ export const Game = {
                     this.aiFinishTime = this.raceTime;
                 }
 
-                if (
-                    this.aiCar &&
-                    this.playerFinished &&
-                    this.aiFinished &&
-                    !this.raceSummaryVisible
-                ) {
-                    const playerWon =
-                        this.playerFinishTime <= this.aiFinishTime;
-
-                    this.awardRace(playerWon);
-                }
-
-                if (
-                    !this.raceFinished &&
-                    this.playerFinished &&
-                    (!this.aiCar || this.aiFinished)
-                ) {
-                    this.raceFinished = true;
-                    this.raceStarted = false;
-
-                    AudioSystem.stopAllEngines();
-                }
             }
             else if (this.raceFinished) {
+                if (this.playerFinished && this.aiCar && !this.aiFinished) {
+                    this.raceTime += dt;
+                }
+
                 if (this.playerFinished) {
                     this.updateFinishedCoast(this.playerCar, dt);
                 }
 
-                if (this.aiCar && this.aiFinished) {
+                if (this.aiCar && !this.aiFinished) {
+                    Physics.update(this.aiCar, dt);
+
+                    if (this.aiCar.pos >= this.trackLength) {
+                        this.aiFinished = true;
+                        this.aiFinishTime = this.raceTime;
+                    }
+                }
+                else if (this.aiCar) {
                     this.updateFinishedCoast(this.aiCar, dt);
                 }
             }
@@ -949,11 +1891,30 @@ export const Game = {
 ,
 
     restoreTestDriveCar() {
-        if (this.runMode !== "testDrive" || !this.preTestDriveCar) return;
+        if (!this.preTestDriveCar && !this.preTestDriveCarId) return;
 
-        this.playerCar = this.preTestDriveCar;
+        const restoredCar =
+            this.preTestDriveCarId && this.garageCars[this.preTestDriveCarId]
+                ? this.garageCars[this.preTestDriveCarId]
+                : this.preTestDriveCar;
+
+        if (!restoredCar) return;
+
+        this.playerCar = restoredCar;
         this.preTestDriveCar = null;
+        this.preTestDriveCarId = "";
         this.testDriveCar = null;
         this.runMode = "race";
+        this.aiCar = null;
+        this.raceStarted = false;
+        this.countdownActive = false;
+
+        if ((window as any).syncGarageUI) {
+            (window as any).syncGarageUI();
+        }
+
+        if ((window as any).syncShopUI) {
+            (window as any).syncShopUI();
+        }
     }
 };

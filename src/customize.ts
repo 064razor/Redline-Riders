@@ -1,5 +1,11 @@
 import { SaveSystem } from "./save.js";
 import { Decals } from "./decals.js";
+function recordSpent(game: any, amount: number) {
+    if (game?.recordMoneySpent) {
+        game.recordMoneySpent(amount);
+    }
+}
+
 export const Customize = {
 
     needlePrice: 25,
@@ -19,6 +25,7 @@ export const Customize = {
     }
 
     game.money -= this.rimPrice;
+    recordSpent(game, this.rimPrice);
     game.playerCar.rimStyle = style;
 
     SaveSystem.save(game);
@@ -38,6 +45,7 @@ export const Customize = {
         }
 
         game.money -= this.needlePrice;
+        recordSpent(game, this.needlePrice);
         game.playerCar.needleColor = color;
 		
 		SaveSystem.save(game);
@@ -56,6 +64,7 @@ export const Customize = {
         }
 
         game.money -= this.hubPrice;
+        recordSpent(game, this.hubPrice);
         game.playerCar.hubColor = color;
 		
 		SaveSystem.save(game);
@@ -74,6 +83,7 @@ export const Customize = {
         }
 
         game.money -= this.textPrice;
+        recordSpent(game, this.textPrice);
         game.playerCar.tachTextColor = color;
 		
 		SaveSystem.save(game);
@@ -92,6 +102,7 @@ export const Customize = {
         }
 
         game.money -= this.paintPrice;
+        recordSpent(game, this.paintPrice);
         game.playerCar.paintColor = color;
 		
 		SaveSystem.save(game);
@@ -124,6 +135,7 @@ export const Customize = {
         }
 
         game.money -= price;
+        recordSpent(game, price);
         game.playerCar.decalId = decal.id;
         game.playerCar.decalColor = decal.colorable ? color : "#ffffff";
 
@@ -143,6 +155,7 @@ export const Customize = {
         }
 
         game.money -= this.underglowPrice;
+        recordSpent(game, this.underglowPrice);
         game.playerCar.underglowColor = color;
 
         SaveSystem.save(game);

@@ -19,6 +19,18 @@ export const Dealer = {
             description: "Lightweight, zippy hatchback with quick response."
         },
         {
+            bodyId: "swagLadybug2024",
+            price: 950,
+            displayName: Bodywork.cars.swagLadybug2024.displayName,
+            description: "Soft, friendly compact hatch. A humble alternate starter candidate."
+        },
+        {
+            bodyId: "scholarVibratio",
+            price: 2250,
+            displayName: Bodywork.cars.scholarVibratio.displayName,
+            description: "AWD launch specialist. Confident off the line, practical everywhere else."
+        },
+        {
             bodyId: "rouletteBlair",
             price: 2100,
             displayName: Bodywork.cars.rouletteBlair.displayName,
@@ -53,6 +65,14 @@ export const Dealer = {
 
         if (bodyId === "swagGG2") {
             return Garage.getSwagGG2();
+        }
+
+        if (bodyId === "swagLadybug2024") {
+            return Garage.getSwagLadybug2024();
+        }
+
+        if (bodyId === "scholarVibratio") {
+            return Garage.getScholarVibratio();
         }
 
         if (bodyId === "rouletteBlair") {
@@ -99,6 +119,10 @@ export const Dealer = {
         }
 
         game.money -= listing.price;
+        if (game.recordMoneySpent) {
+            game.recordMoneySpent(listing.price);
+        }
+
         game.ownedCars.push(bodyId);
         game.garageCars[bodyId] = newCar;
 

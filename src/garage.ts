@@ -82,12 +82,34 @@ export function getDefaultTorqueCurve(bodyId: string) {
 
     if (bodyId === "hannaCivilian") {
         return [
-            [0.00, 0.38],
-            [0.24, 0.58],
-            [0.46, 0.78],
-            [0.68, 0.92],
-            [0.88, 0.84],
+            [0.00, 0.34],
+            [0.24, 0.50],
+            [0.46, 0.70],
+            [0.68, 0.84],
+            [0.88, 0.78],
+            [1.00, 0.54]
+        ];
+    }
+
+    if (bodyId === "swagLadybug2024") {
+        return [
+            [0.00, 0.44],
+            [0.22, 0.64],
+            [0.44, 0.86],
+            [0.66, 1.00],
+            [0.84, 0.88],
             [1.00, 0.58]
+        ];
+    }
+
+    if (bodyId === "scholarVibratio") {
+        return [
+            [0.00, 0.56],
+            [0.22, 0.82],
+            [0.42, 1.00],
+            [0.64, 0.94],
+            [0.84, 0.78],
+            [1.00, 0.55]
         ];
     }
 
@@ -156,6 +178,160 @@ export function migrateGaragePowerAdderCurves(cars: any) {
         }
     }
 }
+
+export function getDefaultDragCoefficient(bodyId: string) {
+    if (bodyId === "maruMk5") return 0.31;
+    if (bodyId === "hannaCivilian") return 0.34;
+    if (bodyId === "swagLadybug2024") return 0.36;
+    if (bodyId === "scholarVibratio") return 0.36;
+    if (bodyId === "rouletteBlair") return 0.39;
+    if (bodyId === "swagGG2") return 0.42;
+    if (bodyId === "rouletteMontBlanc") return 0.46;
+
+    return 0.34;
+}
+
+export type CarArchetype = {
+    id: string;
+    name: string;
+    focus: string;
+    strengths: string[];
+    cautions: string[];
+};
+
+export function getCarArchetype(bodyId: string): CarArchetype {
+    if (bodyId === "maruMk5") {
+        return {
+            id: "balancedRoadster",
+            name: "Balanced Roadster",
+            focus: "Lightweight all-rounder with friendly handling and efficient aero.",
+            strengths: ["Balanced upgrades", "Clean shifting", "Short-to-medium tracks"],
+            cautions: ["Needs power to dominate longer races"]
+        };
+    }
+
+    if (bodyId === "swagGG2") {
+        return {
+            id: "momentumHatch",
+            name: "Momentum Hatch",
+            focus: "Low-weight FWD hatch that rewards launch control and careful traction upgrades.",
+            strengths: ["Light weight", "Early acceleration", "Cheap tuning"],
+            cautions: ["Aero drag", "FWD wheelspin", "Needs gearing for long tracks"]
+        };
+    }
+
+    if (bodyId === "rouletteBlair") {
+        return {
+            id: "heavyMuscleCruiser",
+            name: "Heavy Muscle Cruiser",
+            focus: "Big-torque heavyweight that wants grip, weight reduction, and room to pull.",
+            strengths: ["Torque", "Top speed potential", "Forced induction payoff"],
+            cautions: ["Weight", "Traction", "Slow shift recovery"]
+        };
+    }
+
+    if (bodyId === "rouletteMontBlanc") {
+        return {
+            id: "budgetV6Bruiser",
+            name: "Budget V6 Bruiser",
+            focus: "Affordable muscle coupe with strong midrange but limited stock grip and aero.",
+            strengths: ["Midrange torque", "Upgrade value", "Short-track pressure"],
+            cautions: ["Grip", "Drag", "Stock top-end fade"]
+        };
+    }
+
+    if (bodyId === "hannaCivilian") {
+        return {
+            id: "economyTuner",
+            name: "Economy Tuner",
+            focus: "Compact commuter base that needs deliberate upgrades before it becomes serious.",
+            strengths: ["Upgrade flexibility", "Transmission gains", "Efficient coupe shape"],
+            cautions: ["Weak stock acceleration", "Modest torque", "Needs balanced investment"]
+        };
+    }
+
+    if (bodyId === "swagLadybug2024") {
+        return {
+            id: "friendlyStarter",
+            name: "Friendly Starter",
+            focus: "Soft compact hatch with approachable grip, modest power, and broad upgrade options.",
+            strengths: ["Easy control", "Balanced stats", "Starter-friendly"],
+            cautions: ["Weak stock power", "Average top speed", "Needs upgrades to specialize"]
+        };
+    }
+
+    if (bodyId === "scholarVibratio") {
+        return {
+            id: "awdLauncher",
+            name: "AWD Launcher",
+            focus: "All-wheel-drive practical sedan that launches cleanly and stays composed, but carries extra weight.",
+            strengths: ["Launch consistency", "Traction", "Short-to-medium tracks"],
+            cautions: ["Weight", "Average top end", "Needs power to pull away"]
+        };
+    }
+
+    return {
+        id: "generalPurpose",
+        name: "General Purpose",
+        focus: "Flexible build with no specialized tuning identity yet.",
+        strengths: ["Adaptable"],
+        cautions: ["Undefined role"]
+    };
+}
+
+export function applyCarArchetype(car: any) {
+    if (!car) return;
+
+    const archetype =
+        getCarArchetype(car.bodyId || "");
+
+    car.archetypeId =
+        archetype.id;
+
+    car.archetypeName =
+        archetype.name;
+
+    car.archetypeFocus =
+        archetype.focus;
+
+    car.archetypeStrengths =
+        archetype.strengths;
+
+    car.archetypeCautions =
+        archetype.cautions;
+}
+
+export function migrateGarageArchetypes(cars: any) {
+    if (!cars) return;
+
+    for (const carId of Object.keys(cars)) {
+        applyCarArchetype(cars[carId]);
+    }
+}
+
+export function migrateGarageDragCoefficients(cars: any) {
+    if (!cars) return;
+
+    for (const carId of Object.keys(cars)) {
+        const car = cars[carId];
+
+        if (!car) continue;
+
+        if (!Number.isFinite(car.dragCoefficient)) {
+            car.dragCoefficient =
+                getDefaultDragCoefficient(car.bodyId || carId);
+        }
+
+        if (!Number.isFinite(car.aeroLevel)) {
+            car.aeroLevel = 0;
+        }
+
+        if (!Number.isFinite(car.aeroPrice)) {
+            car.aeroPrice = 575;
+        }
+    }
+}
+
 function applyTopSpeedRebalance(
     car: any,
     oldTopSpeed: number,
@@ -201,7 +377,7 @@ export function migrateGarageBalanceDefaults(cars: any) {
         const car = cars[carId];
         const bodyId = car?.bodyId || carId;
 
-        if (!car || (car.balanceVersion || 0) >= 3) {
+        if (!car || (car.balanceVersion || 0) >= 5) {
             continue;
         }
 
@@ -253,27 +429,53 @@ export function migrateGarageBalanceDefaults(cars: any) {
                     ? 112
                     : 120;
 
-            applyTopSpeedRebalance(car, oldHannaTopSpeed, 104, [31, 49, 67, 84, 96, 104]);
+            const previousTopSpeed =
+                Number.isFinite(car.topSpeed)
+                    ? car.topSpeed
+                    : oldHannaTopSpeed;
 
-            if ((car.hp || 127) > 108 && (car.engineLevel || 0) === 0) {
-                car.hp = 108;
+            const topSpeedUpgradeDelta =
+                Math.max(0, previousTopSpeed - 104);
+
+            applyTopSpeedRebalance(car, oldHannaTopSpeed, 104, [34, 54, 73, 89, 98, 104]);
+
+            car.topSpeed =
+                104 + topSpeedUpgradeDelta;
+
+            car.gearMaxSpeeds = [34, 54, 73, 89, 98, car.topSpeed];
+
+            const hpUpgradeDelta =
+                Math.max(0, (car.hp || 108) - 108);
+
+            const torqueUpgradeDelta =
+                Math.max(0, (car.torque || 104) - 104);
+
+            car.hp =
+                98 + hpUpgradeDelta;
+
+            car.torque =
+                94 + torqueUpgradeDelta;
+
+            if ((car.weightReductionLevel || 0) === 0) {
+                car.weight = 2700;
+            }
+            else {
+                car.weight =
+                    Math.min((car.weight || 2600) + 100, 2700);
             }
 
-            if ((car.torque || 128) > 104 && (car.pistonLevel || 0) === 0 && (car.crankLevel || 0) === 0) {
-                car.torque = 104;
+            car.baseWeight = 2700;
+
+            if ((car.tireLevel || 0) === 0 && (car.suspensionLevel || 0) === 0) {
+                car.grip = 96;
+            }
+            else if ((car.tireLevel || 0) > 0 || (car.suspensionLevel || 0) > 0) {
+                car.grip =
+                    Math.max(35, Math.round((car.grip || 102) - 6));
             }
 
-            if ((car.weight || 2480) <= 2480 && (car.weightReductionLevel || 0) === 0) {
-                car.weight = 2600;
-                car.baseWeight = 2600;
-            }
-
-            if ((car.grip || 114) > 102 && (car.tireLevel || 0) === 0 && (car.suspensionLevel || 0) === 0) {
-                car.grip = 102;
-            }
-
-            if ((car.shiftSpeed || 0.34) < 0.4 && (car.flywheelLevel || 0) === 0) {
-                car.shiftSpeed = 0.4;
+            if ((car.shiftSpeed || 0.34) < 0.56 && (car.flywheelLevel || 0) === 0) {
+                car.shiftSpeed = 0.56;
             }
 
             if ((car.ecuLevel || 0) === 0 && (car.topEndLevel || 0) === 0) {
@@ -282,10 +484,20 @@ export function migrateGarageBalanceDefaults(cars: any) {
                 car.powerbandMax = 6600;
             }
 
+            car.gearRatios = [
+                2.92,
+                1.82,
+                1.35,
+                1.05,
+                0.92,
+                0.84
+            ];
+
+            car.finalDrive = 3.74;
             car.torqueCurve = getDefaultTorqueCurve("hannaCivilian");
         }
 
-        car.balanceVersion = 3;
+        car.balanceVersion = 5;
     }
 }
 export function getEngineType(bodyId: string) {
@@ -301,9 +513,14 @@ export function getEngineType(bodyId: string) {
 }
 
 export function getDrivetrain(bodyId: string) {
+    if (bodyId === "scholarVibratio") {
+        return "AWD";
+    }
+
     if (
         bodyId === "swagGG2" ||
-        bodyId === "hannaCivilian"
+        bodyId === "hannaCivilian" ||
+        bodyId === "swagLadybug2024"
     ) {
         return "FWD";
     }
@@ -336,6 +553,11 @@ export const Garage = {
         return {
             name: "Maru MK-5",
             bodyId: "maruMk5",
+            archetypeId: getCarArchetype("maruMk5").id,
+            archetypeName: getCarArchetype("maruMk5").name,
+            archetypeFocus: getCarArchetype("maruMk5").focus,
+            archetypeStrengths: getCarArchetype("maruMk5").strengths,
+            archetypeCautions: getCarArchetype("maruMk5").cautions,
             balanceVersion: 3,
             engineType: getEngineType("maruMk5"),
             drivetrain: getDrivetrain("maruMk5"),
@@ -350,6 +572,7 @@ export const Garage = {
             ecuLevel: 0,
             weightReductionLevel: 0,
             suspensionLevel: 0,
+            aeroLevel: 0,
             flywheelLevel: 0,
 			pistonLevel: 0,
 			crankLevel: 0,
@@ -370,6 +593,7 @@ export const Garage = {
             ecuPrice: 260,
             weightReductionPrice: 320,
             suspensionPrice: 195,
+            aeroPrice: 575,
             flywheelPrice: 300,
 			pistonPrice: 450,
 			crankPrice: 500,
@@ -386,6 +610,7 @@ export const Garage = {
 			baseWeight: 2400,
             grip: 120,
 			launchGrip: 4.5,
+            dragCoefficient: 0.31,
 
             spd: 0,
             pos: 0,
@@ -450,6 +675,11 @@ finalDrive: 3.85,
         return {
             name: "Swag GG 2",
             bodyId: "swagGG2",
+            archetypeId: getCarArchetype("swagGG2").id,
+            archetypeName: getCarArchetype("swagGG2").name,
+            archetypeFocus: getCarArchetype("swagGG2").focus,
+            archetypeStrengths: getCarArchetype("swagGG2").strengths,
+            archetypeCautions: getCarArchetype("swagGG2").cautions,
             balanceVersion: 3,
             engineType: getEngineType("swagGG2"),
             drivetrain: getDrivetrain("swagGG2"),
@@ -465,6 +695,7 @@ finalDrive: 3.85,
             ecuLevel: 0,
             weightReductionLevel: 0,
             suspensionLevel: 0,
+            aeroLevel: 0,
             flywheelLevel: 0,
 			pistonLevel: 0,
 			crankLevel: 0,
@@ -485,6 +716,7 @@ finalDrive: 3.85,
             ecuPrice: 275,
             weightReductionPrice: 300,
             suspensionPrice: 150,
+            aeroPrice: 575,
             flywheelPrice: 340,
 			pistonPrice: 450,
 			crankPrice: 500,
@@ -501,6 +733,7 @@ finalDrive: 3.85,
 			baseWeight: 2050,
             grip: 98,
 			launchGrip: 4.5,
+            dragCoefficient: 0.42,
 
             spd: 0,
             pos: 0,
@@ -547,12 +780,211 @@ finalDrive: 3.85,
             wheelspin: false
         };
     },
+    getSwagLadybug2024() {
+        return {
+            name: "Swag Ladybug 2024",
+            bodyId: "swagLadybug2024",
+            archetypeId: getCarArchetype("swagLadybug2024").id,
+            archetypeName: getCarArchetype("swagLadybug2024").name,
+            archetypeFocus: getCarArchetype("swagLadybug2024").focus,
+            archetypeStrengths: getCarArchetype("swagLadybug2024").strengths,
+            archetypeCautions: getCarArchetype("swagLadybug2024").cautions,
+            balanceVersion: 1,
+            engineType: getEngineType("swagLadybug2024"),
+            drivetrain: getDrivetrain("swagLadybug2024"),
+            paintColor: "#ffffff",
+            rimStyle: "classic5",
+            decalId: "none",
+            decalColor: "#ffffff",
+
+            engineLevel: 0,
+            tireLevel: 0,
+            transmissionLevel: 0,
+            exhaustLevel: 0,
+            ecuLevel: 0,
+            weightReductionLevel: 0,
+            suspensionLevel: 0,
+            aeroLevel: 0,
+            flywheelLevel: 0,
+            pistonLevel: 0,
+            crankLevel: 0,
+            intakeLevel: 0,
+            topEndLevel: 0,
+            bottomEndLevel: 0,
+            forcedInductionType: "none",
+            boostPsi: 0,
+            turboSpool: 0,
+            turboLevel: 0,
+            superchargerLevel: 0,
+            displacementLevel: 0,
+
+            enginePrice: 1250,
+            tirePrice: 210,
+            transmissionPrice: 420,
+            exhaustPrice: 160,
+            ecuPrice: 240,
+            weightReductionPrice: 300,
+            suspensionPrice: 175,
+            aeroPrice: 575,
+            flywheelPrice: 320,
+            pistonPrice: 450,
+            crankPrice: 500,
+            intakePrice: 300,
+            topEndPrice: 650,
+            bottomEndPrice: 750,
+            turboPrice: 1800,
+            superchargerPrice: 1700,
+            displacementPrice: 1450,
+
+            hp: 104,
+            torque: 110,
+            weight: 2600,
+            baseWeight: 2600,
+            grip: 112,
+            launchGrip: 4.2,
+            dragCoefficient: 0.36,
+
+            spd: 0,
+            pos: 0,
+            rpm: 1000,
+            gear: 1,
+
+            maxRPM: 6200,
+            powerbandMin: 3400,
+            powerbandMax: 5900,
+            torqueCurve: [
+                [0.00, 0.44],
+                [0.22, 0.64],
+                [0.44, 0.86],
+                [0.66, 1.00],
+                [0.84, 0.88],
+                [1.00, 0.58]
+            ],
+
+            gears: 6,
+            topSpeed: 118,
+            gearRatios: [3.05, 1.88, 1.32, 1.02, 0.84, 0.72],
+            gearMaxSpeeds: [30, 49, 69, 89, 106, 118],
+            finalDrive: 3.62,
+            shiftSpeed: 0.46,
+            shiftTimer: 0,
+            shiftRPMDrop: false,
+
+            needleColor: "#ff3333",
+            hubColor: "#ff3333",
+            tachTextColor: "#ffffff",
+
+            wheelspin: false
+        };
+    },
+    getScholarVibratio() {
+        return {
+            name: "Scholar Vibratio",
+            bodyId: "scholarVibratio",
+            archetypeId: getCarArchetype("scholarVibratio").id,
+            archetypeName: getCarArchetype("scholarVibratio").name,
+            archetypeFocus: getCarArchetype("scholarVibratio").focus,
+            archetypeStrengths: getCarArchetype("scholarVibratio").strengths,
+            archetypeCautions: getCarArchetype("scholarVibratio").cautions,
+            balanceVersion: 1,
+            engineType: getEngineType("scholarVibratio"),
+            drivetrain: getDrivetrain("scholarVibratio"),
+            paintColor: "#ffffff",
+            rimStyle: "multiSpoke",
+            decalId: "none",
+            decalColor: "#ffffff",
+
+            engineLevel: 0,
+            tireLevel: 0,
+            transmissionLevel: 0,
+            exhaustLevel: 0,
+            ecuLevel: 0,
+            weightReductionLevel: 0,
+            suspensionLevel: 0,
+            aeroLevel: 0,
+            flywheelLevel: 0,
+            pistonLevel: 0,
+            crankLevel: 0,
+            intakeLevel: 0,
+            topEndLevel: 0,
+            bottomEndLevel: 0,
+            forcedInductionType: "none",
+            boostPsi: 0,
+            turboSpool: 0,
+            turboLevel: 0,
+            superchargerLevel: 0,
+            displacementLevel: 0,
+
+            enginePrice: 1350,
+            tirePrice: 290,
+            transmissionPrice: 520,
+            exhaustPrice: 180,
+            ecuPrice: 300,
+            weightReductionPrice: 360,
+            suspensionPrice: 220,
+            aeroPrice: 575,
+            flywheelPrice: 330,
+            pistonPrice: 450,
+            crankPrice: 500,
+            intakePrice: 300,
+            topEndPrice: 650,
+            bottomEndPrice: 750,
+            turboPrice: 1800,
+            superchargerPrice: 1700,
+            displacementPrice: 1450,
+
+            hp: 132,
+            torque: 126,
+            weight: 3050,
+            baseWeight: 3050,
+            grip: 138,
+            launchGrip: 5.8,
+            dragCoefficient: 0.36,
+
+            spd: 0,
+            pos: 0,
+            rpm: 1000,
+            gear: 1,
+
+            maxRPM: 6500,
+            powerbandMin: 3200,
+            powerbandMax: 5900,
+            torqueCurve: [
+                [0.00, 0.56],
+                [0.22, 0.82],
+                [0.42, 1.00],
+                [0.64, 0.94],
+                [0.84, 0.78],
+                [1.00, 0.55]
+            ],
+
+            gears: 6,
+            topSpeed: 126,
+            gearRatios: [3.35, 2.05, 1.44, 1.10, 0.88, 0.74],
+            gearMaxSpeeds: [29, 47, 65, 84, 105, 126],
+            finalDrive: 3.9,
+            shiftSpeed: 0.48,
+            shiftTimer: 0,
+            shiftRPMDrop: false,
+
+            needleColor: "#ff3333",
+            hubColor: "#ff3333",
+            tachTextColor: "#ffffff",
+
+            wheelspin: false
+        };
+    },
 	getRouletteBlair() {
 		
     return {
         name: "Roulette Blair",
         bodyId: "rouletteBlair",
-        balanceVersion: 3,
+        archetypeId: getCarArchetype("rouletteBlair").id,
+        archetypeName: getCarArchetype("rouletteBlair").name,
+        archetypeFocus: getCarArchetype("rouletteBlair").focus,
+        archetypeStrengths: getCarArchetype("rouletteBlair").strengths,
+        archetypeCautions: getCarArchetype("rouletteBlair").cautions,
+        balanceVersion: 4,
         engineType: getEngineType("rouletteBlair"),
         drivetrain: getDrivetrain("rouletteBlair"),
         paintColor: "#ffffff",
@@ -567,6 +999,7 @@ finalDrive: 3.85,
         ecuLevel: 0,
         weightReductionLevel: 0,
         suspensionLevel: 0,
+        aeroLevel: 0,
         flywheelLevel: 0,
         pistonLevel: 0,
         crankLevel: 0,
@@ -587,6 +1020,7 @@ finalDrive: 3.85,
         ecuPrice: 360,
         weightReductionPrice: 520,
         suspensionPrice: 250,
+        aeroPrice: 575,
         flywheelPrice: 300,
 		pistonPrice: 450,
 		crankPrice: 500,
@@ -603,6 +1037,7 @@ finalDrive: 3.85,
 		baseWeight: 4131,
         grip: 19,
 		launchGrip: 2.0,
+        dragCoefficient: 0.39,
 
         spd: 0,
         pos: 0,
@@ -654,7 +1089,12 @@ finalDrive: 3.85,
 
         id: "rouletteMontBlanc",
 		bodyId: "rouletteMontBlanc",
-        balanceVersion: 3,
+        archetypeId: getCarArchetype("rouletteMontBlanc").id,
+        archetypeName: getCarArchetype("rouletteMontBlanc").name,
+        archetypeFocus: getCarArchetype("rouletteMontBlanc").focus,
+        archetypeStrengths: getCarArchetype("rouletteMontBlanc").strengths,
+        archetypeCautions: getCarArchetype("rouletteMontBlanc").cautions,
+        balanceVersion: 4,
         engineType: getEngineType("rouletteMontBlanc"),
         drivetrain: getDrivetrain("rouletteMontBlanc"),
 		paintColor: "#ffffff",
@@ -671,6 +1111,7 @@ finalDrive: 3.85,
         baseWeight: 3550,
         grip: 18,
         launchGrip: 1.2,
+        dragCoefficient: 0.46,
         maxRPM: 5400,
         powerbandMin: 2500,
         powerbandMax: 4700,
@@ -717,6 +1158,7 @@ finalDrive: 3.85,
         ecuLevel: 0,
         weightReductionLevel: 0,
         suspensionLevel: 0,
+        aeroLevel: 0,
         flywheelLevel: 0,
 
         pistonLevel: 0,
@@ -738,6 +1180,7 @@ finalDrive: 3.85,
         ecuPrice: 260,
         weightReductionPrice: 320,
         suspensionPrice: 195,
+        aeroPrice: 575,
         flywheelPrice: 300,
 
         pistonPrice: 450,
@@ -763,7 +1206,12 @@ finalDrive: 3.85,
     return {
         name: "Hanna Civilian",
         bodyId: "hannaCivilian",
-        balanceVersion: 3,
+        archetypeId: getCarArchetype("hannaCivilian").id,
+        archetypeName: getCarArchetype("hannaCivilian").name,
+        archetypeFocus: getCarArchetype("hannaCivilian").focus,
+        archetypeStrengths: getCarArchetype("hannaCivilian").strengths,
+        archetypeCautions: getCarArchetype("hannaCivilian").cautions,
+        balanceVersion: 5,
         engineType: getEngineType("hannaCivilian"),
         drivetrain: getDrivetrain("hannaCivilian"),
 
@@ -779,6 +1227,7 @@ finalDrive: 3.85,
         ecuLevel: 0,
         weightReductionLevel: 0,
         suspensionLevel: 0,
+        aeroLevel: 0,
         flywheelLevel: 0,
 
         pistonLevel: 0,
@@ -800,6 +1249,7 @@ finalDrive: 3.85,
         ecuPrice: 310,
         weightReductionPrice: 280,
         suspensionPrice: 180,
+        aeroPrice: 575,
         flywheelPrice: 360,
 
         pistonPrice: 450,
@@ -811,13 +1261,14 @@ finalDrive: 3.85,
             superchargerPrice: 1700,
             displacementPrice: 1450,
 
-        hp: 108,
-        torque: 104,
-        weight: 2600,
-        baseWeight: 2600,
+        hp: 98,
+        torque: 94,
+        weight: 2700,
+        baseWeight: 2700,
 
-        grip: 102,
+        grip: 96,
         launchGrip: 3.8,
+        dragCoefficient: 0.34,
 
         spd: 0,
         pos: 0,
@@ -828,12 +1279,12 @@ finalDrive: 3.85,
         powerbandMin: 4500,
         powerbandMax: 6600,
         torqueCurve: [
-            [0.00, 0.38],
-            [0.24, 0.58],
-            [0.46, 0.78],
-            [0.68, 0.92],
-            [0.88, 0.84],
-            [1.00, 0.58]
+            [0.00, 0.34],
+            [0.24, 0.50],
+            [0.46, 0.70],
+            [0.68, 0.84],
+            [0.88, 0.78],
+            [1.00, 0.54]
         ],
 
         gears: 6,
@@ -841,18 +1292,18 @@ finalDrive: 3.85,
         topSpeed: 104,
 
         gearRatios: [
-            3.20,
-            2.05,
-            1.52,
-            1.18,
-            1.00,
-            0.92
+            2.92,
+            1.82,
+            1.35,
+            1.05,
+            0.92,
+            0.84
         ],
 
-        gearMaxSpeeds: [31, 49, 67, 84, 96, 104],
+        gearMaxSpeeds: [34, 54, 73, 89, 98, 104],
 
-        finalDrive: 4.10,
-        shiftSpeed: 0.4,
+        finalDrive: 3.74,
+        shiftSpeed: 0.56,
         shiftTimer: 0,
         shiftRPMDrop: false,
 
