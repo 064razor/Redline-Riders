@@ -50,7 +50,8 @@ Volkswagen Golf GTI MK2 = Swag GG V2 1992 in-game name(Done)
 Chevy Bel Air 1950 = Roulette Blair 1950 in-game name(Done)
 Honda Civic coupe 1999 = Hanna Civilian 1999 in-game name(Done)
 Chevy Monte-Carlo = Roulette Mont Blanc in-game name (done)
-Volkswagen New Beetle 2024 = Swag Ladybug 2024 in-game name
+Volkswagen New Beetle 2024 = Swag Ladybug 2024 in-game name(Done)
+Škoda Octavia(AWD) = Codex Vibratio
 Subaru BRZ 2012 = Subarashi Zen 2012 in-game name
 Toyota MR2 2002 = Tempura Mister2 2002 in-game name
 Ford Focus 2007 = Fjord Foresight 2007 in-game name
@@ -65,7 +66,6 @@ Nissan Altima 2012 = Nexus Ultimate
 Chevy Cavlier: 
 Mazdaspeed6 : Maruspeed6
 Volkswagen XL Sport = Swag XS Proto 
-Škoda Octavia(AWD) = Codex Vibratio
 Toyota Celica: 
 1990 Honda Accord:
 Mini Cooper John Works: 

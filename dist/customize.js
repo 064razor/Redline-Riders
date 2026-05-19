@@ -1,5 +1,10 @@
 import { SaveSystem } from "./save.js";
 import { Decals } from "./decals.js";
+function recordSpent(game, amount) {
+    if (game === null || game === void 0 ? void 0 : game.recordMoneySpent) {
+        game.recordMoneySpent(amount);
+    }
+}
 export const Customize = {
     needlePrice: 25,
     hubPrice: 25,
@@ -15,6 +20,7 @@ export const Customize = {
             return;
         }
         game.money -= this.rimPrice;
+        recordSpent(game, this.rimPrice);
         game.playerCar.rimStyle = style;
         SaveSystem.save(game);
         game.raceMessage = "Rims changed!";
@@ -29,6 +35,7 @@ export const Customize = {
             return;
         }
         game.money -= this.needlePrice;
+        recordSpent(game, this.needlePrice);
         game.playerCar.needleColor = color;
         SaveSystem.save(game);
         game.raceMessage = "Needle color changed!";
@@ -43,6 +50,7 @@ export const Customize = {
             return;
         }
         game.money -= this.hubPrice;
+        recordSpent(game, this.hubPrice);
         game.playerCar.hubColor = color;
         SaveSystem.save(game);
         game.raceMessage = "Center circle color changed!";
@@ -57,6 +65,7 @@ export const Customize = {
             return;
         }
         game.money -= this.textPrice;
+        recordSpent(game, this.textPrice);
         game.playerCar.tachTextColor = color;
         SaveSystem.save(game);
         game.raceMessage = "MPH/Gear color changed!";
@@ -71,6 +80,7 @@ export const Customize = {
             return;
         }
         game.money -= this.paintPrice;
+        recordSpent(game, this.paintPrice);
         game.playerCar.paintColor = color;
         SaveSystem.save(game);
         game.raceMessage = "Car paint changed!";
@@ -95,6 +105,7 @@ export const Customize = {
             return;
         }
         game.money -= price;
+        recordSpent(game, price);
         game.playerCar.decalId = decal.id;
         game.playerCar.decalColor = decal.colorable ? color : "#ffffff";
         SaveSystem.save(game);
@@ -110,6 +121,7 @@ export const Customize = {
             return;
         }
         game.money -= this.underglowPrice;
+        recordSpent(game, this.underglowPrice);
         game.playerCar.underglowColor = color;
         SaveSystem.save(game);
         game.raceMessage = "Neon underglow changed!";

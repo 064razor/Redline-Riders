@@ -6,6 +6,7 @@ export const Options = {
     raceDirection: "right",
     audioMuted: false,
     audioVolume: 1,
+    menuAudioVolume: 0.75,
     opponentAudioVolume: 0.15,
     boostUnit: "PSI",
 };

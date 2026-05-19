@@ -89,6 +89,18 @@
             margin-bottom: 8px;
         }
 
+        .menuHint {
+            margin: 0 auto 14px;
+            padding: 9px 12px;
+            border: 1px solid rgba(105, 216, 255, 0.22);
+            background: rgba(105, 216, 255, 0.07);
+            color: #c9d6e6;
+            font-size: 13px;
+            line-height: 1.35;
+            max-width: 460px;
+            text-align: center;
+        }
+
         .buttonRow {
             margin-top: 10px;
             display: flex;
@@ -316,6 +328,15 @@
             margin-top: 10px;
         }
 
+        .powerTorqueGraph {
+            width: 100%;
+            height: 180px;
+            display: block;
+            margin-top: 12px;
+            background: #101216;
+            border: 1px solid #343a45;
+        }
+
         .dealerViewer {
             min-height: 260px;
             display: grid;
@@ -336,10 +357,160 @@
             margin-bottom: 4px;
         }
 
+        .dealerIconCanvas {
+            width: 100%;
+            max-width: 360px;
+            height: 116px;
+            display: block;
+            margin: 10px auto;
+            background: #101010;
+            border: 1px solid #444;
+        }
+
+        .decalPreviewCanvas {
+            width: 100%;
+            max-width: 260px;
+            height: 86px;
+            display: block;
+            margin: 8px auto 0;
+            background: #101010;
+            border: 1px solid #444;
+        }
+
         .dealerBio {
             color: #d0d0d0;
             margin: 6px auto 10px;
             max-width: 440px;
+        }
+
+        #eventPanel {
+            width: 820px;
+        }
+
+        .eventListings {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .eventPager {
+            display: grid;
+            grid-template-columns: 48px 1fr 48px;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .eventPageButton {
+            min-width: 48px;
+            height: 48px;
+            padding: 0;
+            font-size: 34px;
+            line-height: 1;
+        }
+
+        .eventPageButton:disabled {
+            opacity: 0.32;
+            cursor: default;
+        }
+
+        .eventPageInfo {
+            color: #b9c1ce;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .eventCard {
+            min-height: 150px;
+            border: 1px solid #343a45;
+            background: #151922;
+            padding: 14px;
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 8px;
+        }
+
+        .eventCardHeader {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .eventName {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.15;
+        }
+
+        .eventDifficulty {
+            border: 1px solid #566172;
+            padding: 3px 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            color: #ffffff;
+            background: #202633;
+        }
+
+        .eventDifficulty.beginner {
+            border-color: #54d988;
+            color: #8effb5;
+        }
+
+        .eventDifficulty.normal {
+            border-color: #69d8ff;
+            color: #9be8ff;
+        }
+
+        .eventDifficulty.hard {
+            border-color: #ffc857;
+            color: #ffe39a;
+        }
+
+        .eventDifficulty.expert {
+            border-color: #ff5da8;
+            color: #ff9ccc;
+        }
+
+        .eventTag {
+            color: #b9c1ce;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .eventSummary {
+            color: #c9d0dc;
+            line-height: 1.45;
+        }
+
+        .eventStatus {
+            color: #69d8ff;
+            font-size: 13px;
+        }
+
+        .eventRounds {
+            display: grid;
+            gap: 5px;
+            color: #d6dde8;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+
+        .eventRound {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            padding-top: 5px;
+        }
+
+        .eventRoundName {
+            color: #ffffff;
+            font-weight: bold;
         }
 
         .dealerNav {
@@ -347,6 +518,32 @@
             justify-content: space-between;
             gap: 10px;
             margin-top: 12px;
+        }
+
+        .statsGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .statTile {
+            border: 1px solid #343a45;
+            background: #151922;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .statLabel {
+            color: #b9c1ce;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .statValue {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .dealerNav button {
@@ -362,7 +559,9 @@
         }
 
         #shiftMsg {
-            min-height: 34px;
+            height: 42px;
+            min-height: 42px;
+            line-height: 42px;
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 1px;
@@ -389,16 +588,278 @@
             color: #ff3333;
         }
 
+        #shiftMsg.countdown {
+            font-size: 32px;
+            color: #ffffff;
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
+        }
+
         #countdown {
-            position: absolute;
-            top: 140px;
-            left: 66%;
-            transform: translateX(-50%);
-            font-size: 48px;
+            display: none;
+        }
+
+        :root {
+            --panel-bg: #101216;
+            --panel-bg-2: #171a20;
+            --panel-line: #343a45;
+            --panel-line-hot: #db3131;
+            --text-main: #f4f7fb;
+            --text-soft: #b9c1ce;
+            --cyan: #69d8ff;
+            --green: #73ff76;
+            --gold: #f2c94c;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 50% -160px, rgba(120, 24, 36, 0.36), transparent 370px),
+                linear-gradient(180deg, #08090c 0%, #030304 100%);
+            color: var(--text-main);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: clamp(28px, 4vw, 42px);
+            text-shadow:
+                0 0 18px rgba(255, 55, 55, 0.32),
+                0 2px 0 #111;
+        }
+
+        #mainMenu {
+            background: rgba(13, 15, 19, 0.92);
+            border: 1px solid #2f3540;
+            padding: 10px;
+            box-shadow:
+                0 12px 28px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        button {
+            border-color: #3c4450;
+            background:
+                linear-gradient(180deg, #242a32 0%, #11151b 100%);
+            color: #f5f8ff;
+            min-height: 38px;
+            text-shadow: 0 1px 0 #000;
+        }
+
+        button:hover:not(:disabled) {
+            border-color: var(--panel-line-hot);
+            background:
+                linear-gradient(180deg, #303842 0%, #161b22 100%);
+        }
+
+        button:disabled {
+            color: #8b929d;
+            border-color: #4a2020;
+            background: #171717;
+            cursor: default;
+            opacity: 0.86;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            background: #151a21;
+            color: var(--text-main);
+            border: 1px solid #46505e;
+            padding: 7px 8px;
+            font: inherit;
+        }
+
+        input[type="color"] {
+            width: 44px;
+            height: 34px;
+            padding: 2px;
+            background: #151a21;
+            border: 1px solid #46505e;
+        }
+
+        input[type="range"] {
+            accent-color: var(--cyan);
+        }
+
+        .menuPanel {
+            background:
+                linear-gradient(180deg, rgba(24, 28, 34, 0.98), rgba(12, 14, 18, 0.98));
+            border-color: var(--panel-line);
+            box-shadow:
+                0 18px 34px rgba(0, 0, 0, 0.44),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .panelTitle {
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(105, 216, 255, 0.18);
+        }
+
+        #racePanel > div:not(.panelTitle):not(.menuHint):not(#opponentSelector):not(.buttonRow):not(#controls),
+        #optionsPanel > div:not(.panelTitle):not(.menuHint),
+        #customizePanel > div:not(.panelTitle):not(.menuHint):not(#rimSelector),
+        #savePanel > div:not(.panelTitle):not(.menuHint):not(.buttonRow):not(#saveProfiles) {
+            display: grid;
+            grid-template-columns: minmax(120px, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            max-width: 390px;
+            margin: 8px auto;
+            text-align: left;
+        }
+
+        #opponentSelector,
+        #rimSelector {
+            background: rgba(4, 6, 9, 0.34);
+            border: 1px solid #272d36;
+            padding: 12px;
+        }
+
+        #opponentCanvas,
+        #rimCanvas,
+        #garageCanvas,
+        .dealerIconCanvas,
+        .decalPreviewCanvas {
+            background:
+                linear-gradient(180deg, #15181f 0%, #0b0d11 100%);
+            border-color: #545e6e !important;
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.52);
+        }
+
+        .carStatPanel,
+        .dealerCard {
+            background:
+                linear-gradient(180deg, var(--panel-bg-2), var(--panel-bg));
+            border-color: var(--panel-line);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .carStatPanel b,
+        .dealerCarName,
+        .saveProfileName {
+            color: #ffffff;
+        }
+
+        .dealerBio,
+        .saveProfileMeta,
+        #controls {
+            color: var(--text-soft);
+        }
+
+        .ownedCarButton,
+        .saveProfileButton {
+            background:
+                linear-gradient(180deg, #1e242c, #11151a);
+            border-color: #313945;
+        }
+
+        .ownedCarButton.selected,
+        .saveProfileButton.selected {
+            border-color: var(--panel-line-hot);
+            box-shadow:
+                0 0 0 1px rgba(255, 60, 60, 0.28),
+                0 0 14px rgba(255, 40, 40, 0.28);
+        }
+
+        .carStatPanel > div[style*="margin"] > div:first-child {
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .carStatPanel > div[style*="height:10px"] {
+            height: 8px !important;
+            background: #090b0f !important;
+            border-color: #303844 !important;
+        }
+
+        .dealerNav {
+            align-items: center;
+        }
+
+        #raceSummary {
+            background:
+                linear-gradient(180deg, #191d24, #0f1116);
+            border-color: #4c5665;
+            width: 360px;
+            box-shadow:
+                0 18px 40px rgba(0, 0, 0, 0.5),
+                0 0 22px rgba(105, 216, 255, 0.08);
+        }
+
+        #summaryTitle {
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        #summaryPlayerTime,
+        #summaryAiTime,
+        #summaryDifference,
+        #summaryReward {
+            color: var(--text-soft);
+        }
+
+        #money {
+            color: var(--green);
+            margin-top: 8px;
             font-weight: bold;
-            color: white;
-            pointer-events: none;
-            z-index: 10;
+            text-shadow: 0 0 8px rgba(115, 255, 118, 0.18);
+        }
+
+        #gameCanvas,
+        #tachCanvas {
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+        }
+
+        @media (max-width: 620px) {
+            body {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            #mainMenu {
+                gap: 6px;
+            }
+
+            #mainMenu button {
+                flex: 1 1 120px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .menuPanel {
+                width: auto;
+                max-width: 96%;
+                padding: 12px;
+            }
+
+            #racePanel > div:not(.panelTitle):not(.menuHint):not(#opponentSelector):not(.buttonRow):not(#controls),
+            #optionsPanel > div:not(.panelTitle):not(.menuHint),
+            #customizePanel > div:not(.panelTitle):not(.menuHint):not(#rimSelector),
+            #savePanel > div:not(.panelTitle):not(.menuHint):not(.buttonRow):not(#saveProfiles) {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .eventListings {
+                grid-template-columns: 1fr;
+            }
+
+            .eventPager {
+                grid-template-columns: 40px 1fr 40px;
+            }
+
+            .eventPageButton {
+                min-width: 40px;
+                height: 44px;
+                font-size: 30px;
+            }
+
+            #opponentCarousel {
+                grid-template-columns: 42px 1fr 42px;
+            }
+
+            .opponentArrow {
+                font-size: 42px;
+            }
         }
     </style>
 </head>
@@ -409,10 +870,12 @@
 
 <div id="mainMenu">
     <button id="raceMenuBtn">Race</button>
+    <button id="eventMenuBtn">Events</button>
     <button id="garageMenuBtn">Garage</button>
     <button id="upgradeMenuBtn">Upgrades</button>
     <button id="dealerMenuBtn">Dealership</button>
     <button id="customizeMenuBtn">Customize</button>
+    <button id="statsMenuBtn">Stats</button>
     <button id="optionsMenuBtn">Options</button>
     <button id="saveMenuBtn">Save / Load</button>
 </div>
@@ -483,6 +946,18 @@
     </div>
 </div>
 
+<div id="eventPanel" class="menuPanel hidden">
+    <div class="panelTitle">Events</div>
+    <div class="eventPager">
+        <button id="eventPrevBtn" class="eventPageButton">&lt;</button>
+        <div>
+            <div id="eventPageInfo" class="eventPageInfo"></div>
+            <div id="eventListings" class="eventListings"></div>
+        </div>
+        <button id="eventNextBtn" class="eventPageButton">&gt;</button>
+    </div>
+</div>
+
 <div id="garagePreviewSlot" class="menuPanel hidden">
     <canvas
         id="garageCanvas"
@@ -508,7 +983,6 @@
     <div class="panelTitle" style="margin-top:12px;">Power</div>
 
     <div class="buttonRow">
-        <button id="buyEngine"></button>
         <button id="buyExhaust"></button>
         <button id="buyECU"></button>
     </div>
@@ -524,7 +998,7 @@
         <button id="buyBottomEnd"></button>
     </div>
 
-    <div class="panelTitle" style="margin-top:18px;">Power Adder</div>
+    <div class="panelTitle" style="margin-top:18px;">Aspiration</div>
 
     <div class="buttonRow">
         <button id="buyTurbo"></button>
@@ -538,6 +1012,7 @@
         <button id="buyTires"></button>
         <button id="buySuspension"></button>
         <button id="buyWeightReduction"></button>
+        <button id="buyAero"></button>
     </div>
 
     <div class="panelTitle" style="margin-top:18px;">Drivetrain</div>
@@ -583,9 +1058,17 @@
     </div>
     <div>
         <label>Decal:</label>
-        <select id="decalSelect"></select>
-        <input id="decalColorPicker" type="color" value="#ffffff">
-        <button id="buyDecal"></button>
+        <div>
+            <select id="decalSelect"></select>
+            <input id="decalColorPicker" type="color" value="#ffffff">
+            <button id="buyDecal"></button>
+            <canvas
+                id="decalPreviewCanvas"
+                class="decalPreviewCanvas"
+                width="260"
+                height="86"
+            ></canvas>
+        </div>
     </div>
 
     <div class="panelTitle" style="margin-top:12px;">Tachometer Customization</div>
@@ -609,6 +1092,11 @@
     </div>
 </div>
 
+<div id="statsPanel" class="menuPanel hidden">
+    <div class="panelTitle">Stats</div>
+    <div id="statsInfo"></div>
+</div>
+
 <div id="optionsPanel" class="menuPanel hidden">
     <div class="panelTitle">Options</div>
 	
@@ -623,6 +1111,12 @@
     <label>Audio Volume:</label>
     <input id="audioVolumeSlider" type="range" min="0" max="100" value="100">
     <span id="audioVolumeValue">100%</span>
+</div>
+
+<div>
+    <label>UI/Menu:</label>
+    <input id="menuAudioVolumeSlider" type="range" min="0" max="100" value="75">
+    <span id="menuAudioVolumeValue">75%</span>
 </div>
 
 <div>

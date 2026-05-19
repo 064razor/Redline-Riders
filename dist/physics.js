@@ -182,9 +182,12 @@ export const Physics = {
         const lowGripPenalty = Math.max(1, Math.min(Math.pow(120 / Math.max(gripRating, 1), 0.45), 1.85));
         const drivetrain = car.drivetrain ||
             (car.bodyId === "swagGG2" ||
-                car.bodyId === "hannaCivilian"
+                car.bodyId === "hannaCivilian" ||
+                car.bodyId === "swagLadybug2024"
                 ? "FWD"
-                : "RWD");
+                : car.bodyId === "scholarVibratio"
+                    ? "AWD"
+                    : "RWD");
         const launchSpeed = mphToSpeed(60);
         const launchPhase = 1 - Math.min(car.spd / launchSpeed, 1);
         const rollingGripPhase = Math.sqrt(Math.min(car.spd / mphToSpeed(85), 1));
@@ -203,6 +206,16 @@ export const Physics = {
                 1 + launchPhase * 0.16;
             drivetrainSpinRecovery =
                 0.92;
+        }
+        else if (drivetrain === "AWD") {
+            drivetrainGripMultiplier =
+                1 + launchPhase * (0.24 + accelerationLoad * 0.14);
+            drivetrainSpinPressure =
+                1 - launchPhase * 0.22;
+            drivetrainSpinSeverity =
+                1 - launchPhase * 0.22;
+            drivetrainSpinRecovery =
+                1.16;
         }
         else {
             drivetrainGripMultiplier =
@@ -258,7 +271,9 @@ export const Physics = {
             car.wheelspinIntensity = 0;
         }
         // ===== DRAG =====
-        const drag = car.spd * car.spd * (0.02 / SPEED_FEEL_SCALE);
+        const dragCoefficient = clamp(car.dragCoefficient || 0.34, 0.24, 0.62);
+        const dragScale = clamp(Math.pow(dragCoefficient / 0.34, 1.18), 0.66, 1.55);
+        const drag = car.spd * car.spd * (0.02 / SPEED_FEEL_SCALE) * dragScale;
         let totalAccel = accel - drag;
         totalAccel =
             Math.max(-5 * SPEED_FEEL_SCALE, Math.min(totalAccel, 35 * SPEED_FEEL_SCALE));

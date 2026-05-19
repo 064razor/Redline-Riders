@@ -1,0 +1,46 @@
+Rival System Concept
+
+Core idea:
+Named racers are people in the world.
+Rivals are people with rules.
+
+Named racers:
+- Can cameo in regular races when the player's car looks like a reasonable matchup.
+- Keep consistent names, cars, visual styles, and rough build identities.
+- Do not all need to be full rivals or story-important characters.
+- Can appear in tournament/event lineups for flavor and continuity.
+
+Rivals:
+- Are named racers with extra structure and identity.
+- Can appear in tournament events.
+- Can be challenged from a Rival menu.
+- Should be challenged on their own terms, not as generic rematches.
+
+Rival menu ideas:
+- Show discovered rivals as cards.
+- Hide undiscovered rivals as locked silhouettes or unknown racers.
+- Show rival car, record against the player, preferred track type, and challenge terms.
+- Let the player challenge a rival at will only if the terms are met.
+- If terms are not met, explain why.
+
+Possible rival terms:
+- Required track length.
+- Required or banned aspiration type.
+- Car performance range.
+- Specific class or car type later.
+- Special payout or rematch rules.
+
+Examples:
+- Cruz: clean Maru builds, beginner-to-intermediate 1/4 mile races.
+- Rocket: heavier muscle builds, longer tracks, big-power pressure.
+- Pinky: NA-only challenge identity.
+- Mako: aero and top-speed focused long-track races.
+- Cyber Riders: named crew that can appear together in themed events or separately as cameos.
+
+Implementation direction for later:
+1. Rival profiles.
+2. Rival records per save.
+3. Named racer cameo pool for regular races.
+4. Rival menu.
+5. Rival challenge rules.
+6. Rival event/tournament integration.

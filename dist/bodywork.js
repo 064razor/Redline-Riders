@@ -44,7 +44,11 @@ export const Bodywork = {
                 triBlade: "Tri-Blade",
                 rallyDisc: "Rally Disc",
                 splitTen: "Split Ten",
-                aeroRing: "Aero Ring"
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
             }
         },
         swagGG2: {
@@ -91,7 +95,62 @@ export const Bodywork = {
                 triBlade: "Tri-Blade",
                 rallyDisc: "Rally Disc",
                 splitTen: "Split Ten",
-                aeroRing: "Aero Ring"
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
+            }
+        },
+        swagLadybug2024: {
+            id: "swagLadybug2024",
+            displayName: "Swag Ladybug 2024",
+            inspiration: "2024 compact Beetle-inspired rounded hatch",
+            defaultPaint: "#ffffff",
+            windowColor: "#111a2e",
+            sprite: {
+                imagePath: "./assets/cars/swag-ladybug-2024/body-white.png",
+                paintMaskPath: "./assets/cars/swag-ladybug-2024/paint-mask.png",
+                xOffset: -55,
+                yOffset: 3.4,
+                width: 95.5,
+                height: 32,
+                rearWheel: {
+                    x: -35,
+                    y: 31,
+                    radius: 6.5
+                },
+                frontWheel: {
+                    x: 22,
+                    y: 31,
+                    radius: 6.5
+                }
+            },
+            rims: {
+                classic5: "Classic 5-Spoke",
+                split6: "Classic Split 6-Spoke",
+                mesh: "Classic Street Mesh",
+                deepDish: "Classic Deep Dish",
+                star: "Classic Star Racer",
+                multiSpoke: "Multi-Spoke",
+                turbine: "Turbine",
+                fiveStar: "Five-Star",
+                dragDish: "Drag Dish",
+                splitMesh: "Split Mesh",
+                hyper5: "Hyper 5-Spoke",
+                gtMesh: "GT Mesh",
+                trackTwin: "Track Twin-Spoke",
+                retroSlot: "Retro Slot Mag",
+                muscleChrome: "Muscle Chrome",
+                heritageWire: "Heritage Wire",
+                triBlade: "Tri-Blade",
+                rallyDisc: "Rally Disc",
+                splitTen: "Split Ten",
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
             }
         },
         rouletteBlair: {
@@ -138,7 +197,11 @@ export const Bodywork = {
                 triBlade: "Tri-Blade",
                 rallyDisc: "Rally Disc",
                 splitTen: "Split Ten",
-                aeroRing: "Aero Ring"
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
             }
         },
         rouletteMontBlanc: {
@@ -185,7 +248,62 @@ export const Bodywork = {
                 triBlade: "Tri-Blade",
                 rallyDisc: "Rally Disc",
                 splitTen: "Split Ten",
-                aeroRing: "Aero Ring"
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
+            }
+        },
+        scholarVibratio: {
+            id: "scholarVibratio",
+            displayName: "Scholar Vibratio",
+            inspiration: "AWD liftback built around confident launches and practical speed",
+            defaultPaint: "#ffffff",
+            windowColor: "#111a2e",
+            sprite: {
+                imagePath: "./assets/cars/scholar-vibratio/body-white.png",
+                paintMaskPath: "./assets/cars/scholar-vibratio/paint-mask.png",
+                xOffset: -64,
+                yOffset: 4,
+                width: 104,
+                height: 29,
+                rearWheel: {
+                    x: -40,
+                    y: 30,
+                    radius: 6.9
+                },
+                frontWheel: {
+                    x: 21,
+                    y: 30,
+                    radius: 6.9
+                }
+            },
+            rims: {
+                classic5: "Classic 5-Spoke",
+                split6: "Classic Split 6-Spoke",
+                mesh: "Classic Street Mesh",
+                deepDish: "Classic Deep Dish",
+                star: "Classic Star Racer",
+                multiSpoke: "Multi-Spoke",
+                turbine: "Turbine",
+                fiveStar: "Five-Star",
+                dragDish: "Drag Dish",
+                splitMesh: "Split Mesh",
+                hyper5: "Hyper 5-Spoke",
+                gtMesh: "GT Mesh",
+                trackTwin: "Track Twin-Spoke",
+                retroSlot: "Retro Slot Mag",
+                muscleChrome: "Muscle Chrome",
+                heritageWire: "Heritage Wire",
+                triBlade: "Tri-Blade",
+                rallyDisc: "Rally Disc",
+                splitTen: "Split Ten",
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
             }
         },
         hannaCivilian: {
@@ -232,7 +350,11 @@ export const Bodywork = {
                 triBlade: "Tri-Blade",
                 rallyDisc: "Rally Disc",
                 splitTen: "Split Ten",
-                aeroRing: "Aero Ring"
+                aeroRing: "Aero Ring",
+                cyclone: "Cyclone",
+                haloWire: "Halo Wire",
+                bladeSix: "Blade Six",
+                blockEight: "Block Eight"
             }
         },
     },
@@ -550,6 +672,64 @@ export const Bodywork = {
                     ctx.fill();
                     ctx.restore();
                 }
+                break;
+            case "cyclone":
+                ctx.lineWidth = 2 * scale;
+                for (let i = 0; i < 7; i++) {
+                    const angle = (Math.PI * 2 / 7) * i;
+                    ctx.save();
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(innerRadius * 0.55, -0.8 * scale);
+                    ctx.quadraticCurveTo(5.4 * scale, -5.6 * scale, 1.6 * scale, -(radius - 1));
+                    ctx.lineTo(-1.4 * scale, -(radius - 3));
+                    ctx.quadraticCurveTo(3.4 * scale, -3.6 * scale, innerRadius * 0.55, 0.8 * scale);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                break;
+            case "haloWire":
+                ctx.lineWidth = 1 * scale;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 3, 0, Math.PI * 2);
+                ctx.stroke();
+                for (let i = 0; i < 14; i++) {
+                    const angle = (Math.PI * 2 / 14) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle) * 2, Math.sin(angle) * 2);
+                    ctx.lineTo(Math.cos(angle + 0.7) * (radius - 2), Math.sin(angle + 0.7) * (radius - 2));
+                    ctx.stroke();
+                }
+                break;
+            case "bladeSix":
+                ctx.fillStyle = rimColor;
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI * 2 / 6) * i;
+                    ctx.save();
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(-1.1 * scale, -innerRadius);
+                    ctx.lineTo(2.4 * scale, -innerRadius);
+                    ctx.lineTo(4.2 * scale, -(radius - 1));
+                    ctx.lineTo(-1.8 * scale, -(radius - 3));
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+                break;
+            case "blockEight":
+                ctx.lineWidth = 3 * scale;
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 / 8) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius);
+                    ctx.lineTo(Math.cos(angle) * (radius - 2), Math.sin(angle) * (radius - 2));
+                    ctx.stroke();
+                }
+                ctx.lineWidth = 1.2 * scale;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 4, 0, Math.PI * 2);
+                ctx.stroke();
                 break;
             case "classic5":
             default:

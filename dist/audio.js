@@ -11,10 +11,10 @@ import { Options } from "./options.js";
 const defaultProfile = {
     idle: "public/sounds/maru-mk5-idle.wav",
     rev: "public/sounds/maru-mk5-rev.wav",
-    idleVolume: 0.24,
-    revVolume: 0.42,
-    minRate: 0.72,
-    rateRange: 0.44
+    idleVolume: 0.20,
+    revVolume: 0.34,
+    minRate: 0.62,
+    rateRange: 0.58
 };
 const engineSoundProfiles = {
     maruMk5: defaultProfile,
@@ -26,31 +26,50 @@ const engineSoundProfiles = {
         minRate: 0.7,
         rateRange: 0.4
     },
+    swagLadybug2024: {
+        idle: "public/sounds/hanna-civilian-idle.wav",
+        rev: "public/sounds/hanna-civilian-rev.wav",
+        idleVolume: 0.19,
+        revVolume: 0.34,
+        minRate: 0.62,
+        rateRange: 0.46
+    },
+    scholarVibratio: {
+        idle: "public/sounds/hanna-civilian-idle.wav",
+        rev: "public/sounds/hanna-civilian-rev.wav",
+        idleVolume: 0.21,
+        revVolume: 0.36,
+        minRate: 0.62,
+        rateRange: 0.48
+    },
     rouletteBlair: {
         idle: "public/sounds/roulette-blair-idle.wav",
         rev: "public/sounds/roulette-blair-rev.wav",
-        idleVolume: 0.32,
-        revVolume: 0.48,
-        minRate: 0.66,
-        rateRange: 0.34
+        idleVolume: 0.28,
+        revVolume: 0.42,
+        minRate: 0.64,
+        rateRange: 0.38
     },
     rouletteMontBlanc: {
         idle: "public/sounds/roulette-mont-blanc-idle.wav",
         rev: "public/sounds/roulette-mont-blanc-rev.wav",
-        idleVolume: 0.28,
-        revVolume: 0.44,
-        minRate: 0.7,
-        rateRange: 0.38
+        idleVolume: 0.24,
+        revVolume: 0.38,
+        minRate: 0.64,
+        rateRange: 0.42
     },
     hannaCivilian: {
         idle: "public/sounds/hanna-civilian-idle.wav",
         rev: "public/sounds/hanna-civilian-rev.wav",
         idleVolume: 0.22,
-        revVolume: 0.40,
-        minRate: 0.78,
-        rateRange: 0.52
+        revVolume: 0.44,
+        minRate: 0.66,
+        rateRange: 0.60
     }
 };
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+}
 function configureEngineLoop(idle, rev) {
     idle.loop = true;
     rev.loop = true;
@@ -85,20 +104,27 @@ function applyEngineSound(idle, rev, car, currentBodyId, initialized) {
     }
     return { bodyId, profile };
 }
-function updateEngineChannel(idle, rev, profile, car, volumeScale) {
-    const rpmRatio = Math.min(car.rpm / car.maxRPM, 1);
+function updateEngineChannel(idle, rev, profile, car, volumeScale, throttleHeld = true) {
+    const rpmRatio = clamp(car.rpm / car.maxRPM, 0, 1);
     const masterVolume = Options.audioMuted ? 0 : Options.audioVolume * volumeScale;
-    const lowRPM = rpmRatio <= 0.20;
+    const idleBlend = clamp((0.34 - rpmRatio) / 0.24, 0, 1);
+    const revBlend = clamp((rpmRatio - 0.10) / 0.24, 0, 1);
+    const throttleVolume = throttleHeld ? 1 : 0.68;
     idle.volume =
-        lowRPM
-            ? profile.idleVolume * masterVolume
-            : 0;
+        profile.idleVolume * idleBlend * masterVolume;
     rev.volume =
-        !lowRPM
-            ? (0.08 + rpmRatio * profile.revVolume) * masterVolume
-            : 0;
+        (0.045 + rpmRatio * profile.revVolume) *
+            revBlend *
+            throttleVolume *
+            masterVolume;
     const rate = profile.minRate +
         rpmRatio * profile.rateRange;
+    rev.preservesPitch = false;
+    rev.mozPreservesPitch = false;
+    rev.webkitPreservesPitch = false;
+    idle.preservesPitch = false;
+    idle.mozPreservesPitch = false;
+    idle.webkitPreservesPitch = false;
     rev.playbackRate = rate;
     idle.playbackRate = rate;
 }
@@ -111,6 +137,9 @@ function createInductionChannel(context) {
     const turboGain = context.createGain();
     const superOsc = context.createOscillator();
     const superGain = context.createGain();
+    const superTextureOsc = context.createOscillator();
+    const superTextureGain = context.createGain();
+    const superTextureFilter = context.createBiquadFilter();
     const bassOsc = context.createOscillator();
     const bassGain = context.createGain();
     turboOsc.type = "sine";
@@ -119,12 +148,22 @@ function createInductionChannel(context) {
     turboOsc.connect(turboGain);
     turboGain.connect(context.destination);
     turboOsc.start();
-    superOsc.type = "sawtooth";
+    superOsc.type = "triangle";
     superOsc.frequency.value = 260;
     superGain.gain.value = 0;
     superOsc.connect(superGain);
     superGain.connect(context.destination);
     superOsc.start();
+    superTextureOsc.type = "sawtooth";
+    superTextureOsc.frequency.value = 530;
+    superTextureGain.gain.value = 0;
+    superTextureFilter.type = "bandpass";
+    superTextureFilter.frequency.value = 1450;
+    superTextureFilter.Q.value = 2.4;
+    superTextureOsc.connect(superTextureFilter);
+    superTextureFilter.connect(superTextureGain);
+    superTextureGain.connect(context.destination);
+    superTextureOsc.start();
     bassOsc.type = "sine";
     bassOsc.frequency.value = 85;
     bassGain.gain.value = 0;
@@ -136,6 +175,9 @@ function createInductionChannel(context) {
         turboGain,
         superOsc,
         superGain,
+        superTextureOsc,
+        superTextureGain,
+        superTextureFilter,
         bassOsc,
         bassGain,
         lastShiftTimer: 0
@@ -146,7 +188,7 @@ function playTurboFlutter(context, volumeScale) {
         return;
     const now = context.currentTime;
     const master = context.createGain();
-    master.gain.setValueAtTime(0.045 * Options.audioVolume * volumeScale, now);
+    master.gain.setValueAtTime(0.023 * Options.audioVolume * volumeScale, now);
     master.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
     master.connect(context.destination);
     for (let i = 0; i < 3; i++) {
@@ -157,7 +199,7 @@ function playTurboFlutter(context, volumeScale) {
         osc.frequency.setValueAtTime(520 - i * 80, start);
         osc.frequency.exponentialRampToValueAtTime(260 - i * 35, start + 0.08);
         gain.gain.setValueAtTime(0.001, start);
-        gain.gain.linearRampToValueAtTime(0.8, start + 0.01);
+        gain.gain.linearRampToValueAtTime(0.50, start + 0.012);
         gain.gain.exponentialRampToValueAtTime(0.001, start + 0.08);
         osc.connect(gain);
         gain.connect(master);
@@ -170,6 +212,11 @@ export const AudioSystem = {
     rev: new Audio(defaultProfile.rev),
     opponentIdle: new Audio(defaultProfile.idle),
     opponentRev: new Audio(defaultProfile.rev),
+    uiHover: new Audio("public/sounds/ui-hover.wav"),
+    uiSelect: new Audio("public/sounds/ui-select.wav"),
+    uiPurchase: new Audio("public/sounds/ui-purchase.wav"),
+    countdownLow: new Audio("public/sounds/countdown-low.wav"),
+    countdownHigh: new Audio("public/sounds/countdown-high.wav"),
     currentBodyId: "maruMk5",
     currentOpponentBodyId: "maruMk5",
     currentProfile: defaultProfile,
@@ -201,6 +248,31 @@ export const AudioSystem = {
     configureLoops() {
         configureEngineLoop(this.idle, this.rev);
         configureEngineLoop(this.opponentIdle, this.opponentRev);
+        this.uiHover.preload = "auto";
+        this.uiSelect.preload = "auto";
+        this.uiPurchase.preload = "auto";
+        this.countdownLow.preload = "auto";
+        this.countdownHigh.preload = "auto";
+    },
+    playUISound(sound, volume = 1) {
+        if (Options.audioMuted || Options.menuAudioVolume <= 0)
+            return;
+        const instance = sound.cloneNode(true);
+        instance.volume =
+            Math.max(0, Math.min(Options.menuAudioVolume * volume, 1));
+        instance.play().catch(() => { });
+    },
+    playHover() {
+        this.playUISound(this.uiHover, 0.24);
+    },
+    playSelect() {
+        this.playUISound(this.uiSelect, 0.38);
+    },
+    playPurchase() {
+        this.playUISound(this.uiPurchase, 0.52);
+    },
+    playCountdownBeep(high = false) {
+        this.playUISound(high ? this.countdownHigh : this.countdownLow, high ? 0.09 : 0.08);
     },
     setEngineSound(car) {
         const result = applyEngineSound(this.idle, this.rev, car, this.currentBodyId, this.initialized);
@@ -250,6 +322,7 @@ export const AudioSystem = {
             return;
         channel.turboGain.gain.setTargetAtTime(volume, context.currentTime, 0.03);
         channel.superGain.gain.setTargetAtTime(volume, context.currentTime, 0.03);
+        channel.superTextureGain.gain.setTargetAtTime(volume, context.currentTime, 0.03);
         channel.bassGain.gain.setTargetAtTime(volume, context.currentTime, 0.03);
     },
     updateInductionSound(car, channel, volumeScale) {
@@ -262,19 +335,25 @@ export const AudioSystem = {
         const boostPsi = Math.max(0, (car === null || car === void 0 ? void 0 : car.boostPsi) || 0);
         const turboSpool = Math.max(0, Math.min((car === null || car === void 0 ? void 0 : car.turboSpool) || 0, 1));
         const turboVolume = inductionType === "turbo"
-            ? masterVolume * Math.min(0.075, turboSpool * 0.045 + boostPsi * 0.004)
+            ? masterVolume * Math.min(0.040, turboSpool * 0.024 + boostPsi * 0.0021)
             : 0;
         const superVolume = inductionType === "supercharger"
-            ? masterVolume * (0.018 + rpmRatio * 0.038)
+            ? masterVolume * (0.009 + rpmRatio * 0.016)
+            : 0;
+        const superTextureVolume = inductionType === "supercharger"
+            ? masterVolume * (0.0025 + rpmRatio * 0.007)
             : 0;
         const bassVolume = inductionType === "displacement"
             ? masterVolume * (0.012 + rpmRatio * 0.018)
             : 0;
-        channel.turboOsc.frequency.setTargetAtTime(850 + rpmRatio * 1650 + turboSpool * 1300, context.currentTime, 0.04);
-        channel.superOsc.frequency.setTargetAtTime(190 + rpmRatio * 920, context.currentTime, 0.035);
+        channel.turboOsc.frequency.setTargetAtTime(760 + rpmRatio * 1350 + turboSpool * 980, context.currentTime, 0.04);
+        channel.superOsc.frequency.setTargetAtTime(170 + rpmRatio * 760, context.currentTime, 0.035);
+        channel.superTextureOsc.frequency.setTargetAtTime((170 + rpmRatio * 760) * 2.08, context.currentTime, 0.035);
+        channel.superTextureFilter.frequency.setTargetAtTime(950 + rpmRatio * 1750, context.currentTime, 0.04);
         channel.bassOsc.frequency.setTargetAtTime(55 + rpmRatio * 72, context.currentTime, 0.05);
         channel.turboGain.gain.setTargetAtTime(turboVolume, context.currentTime, 0.04);
         channel.superGain.gain.setTargetAtTime(superVolume, context.currentTime, 0.04);
+        channel.superTextureGain.gain.setTargetAtTime(superTextureVolume, context.currentTime, 0.035);
         channel.bassGain.gain.setTargetAtTime(bassVolume, context.currentTime, 0.05);
         const shiftTimer = (car === null || car === void 0 ? void 0 : car.shiftTimer) || 0;
         if (inductionType === "turbo" &&
@@ -291,7 +370,7 @@ export const AudioSystem = {
             return;
         this.ensureInductionAudio();
         this.setEngineSound(car);
-        updateEngineChannel(this.idle, this.rev, this.currentProfile, car, 1);
+        updateEngineChannel(this.idle, this.rev, this.currentProfile, car, 1, throttleHeld);
         this.updateInductionSound(car, this.playerInductionChannel, 1);
     },
     updateOpponentEngine(car) {
@@ -321,7 +400,7 @@ export const AudioSystem = {
         this.stopOpponentEngine();
     },
     playSaveChime() {
-        if (Options.audioMuted)
+        if (Options.audioMuted || Options.menuAudioVolume <= 0)
             return;
         const AudioContextConstructor = getAudioContextConstructor();
         if (!AudioContextConstructor)
@@ -336,7 +415,7 @@ export const AudioSystem = {
         const startTime = context.currentTime;
         const masterGain = context.createGain();
         masterGain.gain.setValueAtTime(0, startTime);
-        masterGain.gain.linearRampToValueAtTime(0.08 * Options.audioVolume, startTime + 0.025);
+        masterGain.gain.linearRampToValueAtTime(0.08 * Options.menuAudioVolume, startTime + 0.025);
         masterGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.45);
         masterGain.connect(context.destination);
         const notes = [

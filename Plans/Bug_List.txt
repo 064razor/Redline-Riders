@@ -1,5 +1,4 @@
 Visual:
-+Dealership still needs car icons/previews in the listing area
 +Race summary is functional but visually plain
 +Some menu text/layout polish remains before itch.io packaging
 
@@ -9,7 +8,7 @@ Gameplay:
 Balance:
 +Per-car drag coefficient is not implemented yet
 +Boosted upgrade balance needs a dedicated pass now that boost is dynamic
-+Opponent class pools are needed so early races do not randomly feel unfair
++Opponent balance measures needed so early races do not randomly feel unfair
 +Dealer prices need a pass after stock class balance settles
 
 Resolved:

@@ -34,6 +34,10 @@ export const SaveSystem = {
             profileName,
             savedAt: new Date().toISOString(),
             money: game.money,
+            stats: game.normalizeStats
+                ? game.normalizeStats(game.stats)
+                : game.stats,
+            completedEvents: game.completedEvents || {},
             ownedCars: game.ownedCars,
             selectedCarId: game.playerCar.bodyId,
             garageCars: game.garageCars,
@@ -45,6 +49,7 @@ export const SaveSystem = {
                 raceDirection: Options.raceDirection,
                 audioMuted: Options.audioMuted,
                 audioVolume: Options.audioVolume,
+                menuAudioVolume: Options.menuAudioVolume,
                 opponentAudioVolume: Options.opponentAudioVolume,
                 boostUnit: Options.boostUnit
             }
